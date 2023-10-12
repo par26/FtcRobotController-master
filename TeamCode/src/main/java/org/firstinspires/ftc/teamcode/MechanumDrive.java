@@ -57,5 +57,8 @@ public class MechanumDrive {
         setPowers(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
     }
 
+    //add function to set robot at specific angle
+    //public void rotate(angle)
+
 
 }
