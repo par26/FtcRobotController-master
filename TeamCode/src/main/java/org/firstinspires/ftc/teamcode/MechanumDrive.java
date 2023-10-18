@@ -58,7 +58,9 @@ public class MechanumDrive {
     }
 
     //add function to set robot at specific angle
-    //public void rotate(angle)
+    public void rotate(double angle) {
+
+    }
 
 
 }
