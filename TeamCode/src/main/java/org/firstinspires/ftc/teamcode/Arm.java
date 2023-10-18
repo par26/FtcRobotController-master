@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad2;
+
+
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Arm {
-        boolean gamepadA = gamepad2.a;
         double leftOpenPositionValue; //declaring servo's open position value so easily manipulable
         double leftClosePositionValue; //declaring servo's close position value so easily manipulable
         double rightOpenPositionValue; //declaring servo's open position value so easily manipulable
@@ -20,13 +20,13 @@ public class Arm {
                 leftClawMotor = hwMap.get(Servo.class, "leftClaw");
         }
 
-        public boolean isButtonPressedChecker() {
+        public boolean isButtonPressedChecker(boolean gamePad) {
                 boolean lastPressed = false, isPressed = false; //line 30 - 35 to ensure claw doesn't keep jittering when gamepad is pressed
                 boolean clawPosition = true;
 
 
                 lastPressed = isPressed;
-                isPressed = gamepadA;
+                isPressed = gamePad;
                 return lastPressed;
         }
         public void closeClaw() {
@@ -37,4 +37,58 @@ public class Arm {
                 leftClawMotor.setPosition(leftOpenPositionValue);
                 rightClawMotor.setPosition(rightOpenPositionValue);
         }
+
+
+        //moves the claw arm upward
+        public void extendClaw() {
+                //set linear slide motors to x position
+
+                //mover the elbow servo to 30 degrees
+
+        }
+
+        //the moves the claw arm downward to resting position
+        public void retractClaw() {
+                //move elbow servo to 0 degress
+
+                //set the linear slide motors to reverse direction
+
+        }
+
+
+
 }
+
+
+/*
+public class Arm {
+
+    int num;
+
+
+
+    public void extendClaw() {
+
+
+    }
+
+    public void retractClaw() {
+
+    }
+
+    public void openClaw() {
+
+    }
+
+    public void closeClaw() {
+
+    }
+
+    public void bendUp() {
+
+    }
+
+    public void bendDown() {
+
+    }
+}*/

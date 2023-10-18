@@ -20,7 +20,7 @@ public class OpenCloseClaw extends OpMode {
     public void loop() {
         boolean clawPosition = true;
 
-        if (arm.isButtonPressedChecker()) { // these if statements closes/opens claw
+        if (arm.isButtonPressedChecker(gamepad1.a)) { // these if statements closes/opens claw
             clawPosition = !clawPosition;
             if (clawPosition) {
                 arm.closeClaw();
