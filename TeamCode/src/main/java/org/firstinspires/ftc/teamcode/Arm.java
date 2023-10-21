@@ -1,20 +1,35 @@
 package org.firstinspires.ftc.teamcode;
 
+
+
+
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Arm {
-        double leftOpenPositionValue = 0.0; //declaring servo's open position value so easily manipulable
-        double leftClosePositionValue = 0.0; //declaring servo's close position value so easily manipulable
-        double rightOpenPositionValue = 0.0; //declaring servo's open position value so easily manipulable
-        double rightClosePositionValue = 0.0; //declaring servo's close position value so easily manipulable
+        double leftOpenPositionValue; //declaring servo's open position value so easily manipulable
+        double leftClosePositionValue; //declaring servo's close position value so easily manipulable
+        double rightOpenPositionValue; //declaring servo's open position value so easily manipulable
+        double rightClosePositionValue; //declaring servo's close position value so easily manipulable
 
         Servo leftClawServo;
         Servo rightClawServo;
 
+        DcMotor leftSlideMotor;
+
+        DcMotor rightSlideMotor;
+
         public void init(HardwareMap hwMap) {
-                rightClawServo = hwMap.get(Servo.class, "rightClaw");
+                rightClawServo = hwMap.get(Servo.class, "leftClaw");
                 leftClawServo = hwMap.get(Servo.class, "leftClaw");
+
+                leftSlideMotor = hwMap.get(DcMotor.class, "leftSlideMotor");
+                leftSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                rightSlideMotor = hwMap.get(DcMotor.class, "rightSlideMotor");
+                rightSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
         public boolean isButtonPressedChecker(boolean gamePad) {
@@ -27,67 +42,61 @@ public class Arm {
                 return lastPressed;
         }
 
-        public void openClawCL() { //bang bang
-                double currentLCPosition = leftClawServo.getPosition();
-                double currentRCPosition = rightClawServo.getPosition();
 
-                while (currentLCPosition != leftOpenPositionValue || rightOpenPositionValue != rightOpenPositionValue) {
+        public void openClaw() {
+                double unroundedCurrentLCP = leftClawServo.getPosition();
+                double currentLCP = Math.round(unroundedCurrentLCP * 10) / 10.0;
 
-                        double unroundedLCError = leftOpenPositionValue - currentLCPosition;
-                        double LCError = Math.round(unroundedLCError * 10.0) / 10.0;
-
-                        if (LCError > 0) { //will exit when RCError = 0
-                                leftClawServo.setPosition(-0.1);
-                        } else if (LCError != 0) {
-                                leftClawServo.setPosition(+0.1);
-                        }
-
-
-                        double unroundedRCError = rightOpenPositionValue - currentRCPosition;
-                        double RCError = Math.round(unroundedRCError * 10.0) / 10.0;
-
-
-                        if (RCError > 0) { // will exit when RCError = 0
-                                rightClawServo.setPosition(-0.1); //questions for big P tomorrow!!!
-                        } else if (RCError != 0) {
-                                rightClawServo.setPosition(+0.1);
-                        }
+                while (currentLCP != leftOpenPositionValue) {
+                    double LCError = leftOpenPositionValue - currentLCP;
+                    currentLCP = currentLCP + LCError;
+                    leftClawServo.setPosition(currentLCP);
                 }
 
+                double unroundedCurrentRCP = rightClawServo.getPosition();
+                double currentRCP = Math.round(unroundedCurrentRCP * 10) / 10.0;
+
+                while (currentRCP != rightOpenPositionValue) {
+                    double RCError = rightOpenPositionValue - currentRCP;
+                    currentRCP = currentRCP + RCError;
+                    rightClawServo.setPosition(currentRCP);
+                }
         }
-        /* public void openClawCL() { // proportional
-                double currentLCPosition = leftClawServo.getPosition();
-                double currentRCPosition = rightClawServo.getPosition();
-
-                while (currentLCPosition != leftOpenPositionValue || rightOpenPositionValue != rightOpenPositionValue) {
-
-                        double unroundedLCError = leftOpenPositionValue - currentLCPosition;
-                        double LCError = Math.round(unroundedLCError * 10.0) / 10.0;
-
-                        leftClawServo.setPosition(LCError);
-
-                        double unroundedRCError = rightOpenPositionValue - currentRCPosition;
-                        double RCError = Math.round(unroundedRCError * 10.0) / 10.0; */ //doubt this works since not loop :troll:
 
 
 
+        public void closeClaw() {
+                double unroundedCurrentLCP = leftClawServo.getPosition();
+                double currentLCP = Math.round(unroundedCurrentLCP * 10) / 10;
 
+                while (currentLCP != leftClosePositionValue) {
+                        double LCError = leftClosePositionValue - currentLCP;
+                        currentLCP = currentLCP + LCError;
+                        leftClawServo.setPosition(currentLCP);
+                }
 
-        public void closeClaw() { // ignore this
-                leftClawServo.setPosition(leftClosePositionValue);
-                rightClawServo.setPosition(rightClosePositionValue);
+                double unroundedCurrentRCP = rightClawServo.getPosition();
+                double currentRCP = Math.round(unroundedCurrentRCP * 10) / 10;
+
+                while (currentRCP != rightClosePositionValue) {
+                        double RCError = rightClosePositionValue - currentRCP;
+                        currentRCP = currentRCP + RCError;
+                        leftClawServo.setPosition(currentRCP);
+                }
         }
-        public void openClaw() { // ignore this
-                leftClawServo.setPosition(leftOpenPositionValue);
-                rightClawServo.setPosition(rightOpenPositionValue);
-        }
+
 
 
         //moves the claw arm upward
         public void extendClaw() {
+
                 //set linear slide motors to x position
 
+
+
+
                 //mover the elbow servo to 30 degrees
+                powerSlides(1);
 
         }
 
@@ -96,7 +105,18 @@ public class Arm {
                 //move elbow servo to 0 degress
 
                 //set the linear slide motors to reverse direction
+                powerSlides(-1);
 
+        }
+
+        //position true means extended, position false means retracted
+        public void powerSlides(int position) {
+                leftSlideMotor.setTargetPosition(position); // the position you want the slides to reach
+
+                leftSlideMotor.setPower(1); // raise at some power
+
+                rightSlideMotor.setTargetPosition(position);
+                rightSlideMotor.setPower(1);
         }
 
 
