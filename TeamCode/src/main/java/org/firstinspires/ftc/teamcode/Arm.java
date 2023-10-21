@@ -25,10 +25,10 @@ public class Arm {
         leftClawMotor = hwMap.get(Servo.class, "leftClaw");
 
         leftSlideMotor = hwMap.get(DcMotor.class, "leftSlideMotor");
-        leftSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         rightSlideMotor = hwMap.get(DcMotor.class, "rightSlideMotor");
-        rightSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public boolean isButtonPressedChecker(boolean gamePad) {
@@ -111,9 +111,9 @@ public class Arm {
 
     //position true means extended, position false means retracted
     public void powerSlides(int position) {
-        leftSlideMotor.setTargetPosition(position); // the position you want the slides to reach
 
-        leftSlideMotor.setPower(1); // raise at some power
+
+        leftSlideMotor.setTargetPosition(position); // the position you want the slides to reach
 
         rightSlideMotor.setTargetPosition(position);
         rightSlideMotor.setPower(1);

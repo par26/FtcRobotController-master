@@ -59,7 +59,9 @@ public class MechanumDrive {
 
     //add function to set robot at specific angle
     public void rotate(double angle) {
+        //take the current angle through imu
 
+        //use pid controller to adjust it's rotation
     }
 
 
