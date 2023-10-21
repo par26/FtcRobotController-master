@@ -6,7 +6,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Arm {
         double leftOpenPositionValue; //declaring servo's open position value so easily manipulable
@@ -21,16 +20,20 @@ public class Arm {
 
         DcMotor rightSlideMotor;
 
-        public void init(HardwareMap hwMap) {
-                rightClawServo = hwMap.get(Servo.class, "leftClaw");
-                leftClawServo = hwMap.get(Servo.class, "leftClaw");
+    DcMotor leftSlideMotor;
 
-                leftSlideMotor = hwMap.get(DcMotor.class, "leftSlideMotor");
-                leftSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    DcMotor rightSlideMotor;
 
-                rightSlideMotor = hwMap.get(DcMotor.class, "rightSlideMotor");
-                rightSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
+    public void init(HardwareMap hwMap) {
+        rightClawServo = hwMap.get(Servo.class, "leftClaw");
+        leftClawServo = hwMap.get(Servo.class, "leftClaw");
+
+        leftSlideMotor = hwMap.get(DcMotor.class, "leftSlideMotor");
+        leftSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        rightSlideMotor = hwMap.get(DcMotor.class, "rightSlideMotor");
+        rightSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
 
         public boolean isButtonPressedChecker(boolean gamePad) {
                 boolean lastPressed = false, isPressed = false; //line 30 - 35 to ensure claw doesn't keep jittering when gamepad is pressed
@@ -87,37 +90,37 @@ public class Arm {
 
 
 
-        //moves the claw arm upward
-        public void extendClaw() {
+    //moves the claw arm upward
+    public void extendClaw() {
 
-                //set linear slide motors to x position
-
-
+        //set linear slide motors to x position
 
 
-                //mover the elbow servo to 30 degrees
-                powerSlides(1);
 
-        }
+
+        //mover the elbow servo to 30 degrees
+        powerSlides(1);
+
+    }
 
         //the moves the claw arm downward to resting position
         public void retractClaw() {
                 //move elbow servo to 0 degress
 
-                //set the linear slide motors to reverse direction
-                powerSlides(-1);
+        //set the linear slide motors to reverse direction
+        powerSlides(-1);
 
-        }
+    }
 
-        //position true means extended, position false means retracted
-        public void powerSlides(int position) {
-                leftSlideMotor.setTargetPosition(position); // the position you want the slides to reach
+    //position true means extended, position false means retracted
+    public void powerSlides(int position) {
 
-                leftSlideMotor.setPower(1); // raise at some power
 
-                rightSlideMotor.setTargetPosition(position);
-                rightSlideMotor.setPower(1);
-        }
+        leftSlideMotor.setTargetPosition(position); // the position you want the slides to reach
+
+        rightSlideMotor.setTargetPosition(position);
+        rightSlideMotor.setPower(1);
+    }
 
 
 
