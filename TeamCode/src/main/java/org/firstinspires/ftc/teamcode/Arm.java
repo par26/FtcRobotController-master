@@ -3,9 +3,13 @@ package org.firstinspires.ftc.teamcode;
 
 
 
+import com.acmerobotics.roadrunner.control.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.teamcode.utils.PIDController;
 
 public class Arm {
     double leftOpenPositionValue; //declaring servo's open position value so easily manipulable
@@ -16,18 +20,19 @@ public class Arm {
     Servo leftClawMotor;
     Servo rightClawMotor;
 
-    DcMotor leftSlideMotor;
+    DcMotorEx leftSlideMotor;
 
-    DcMotor rightSlideMotor;
+    DcMotorEx rightSlideMotor;
 
+    boolean slideMoving;
     public void init(HardwareMap hwMap) {
         rightClawMotor = hwMap.get(Servo.class, "leftClaw");
         leftClawMotor = hwMap.get(Servo.class, "leftClaw");
 
-        leftSlideMotor = hwMap.get(DcMotor.class, "leftSlideMotor");
+        leftSlideMotor = hwMap.get(DcMotorEx.class, "leftSlideMotor");
         leftSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        rightSlideMotor = hwMap.get(DcMotor.class, "rightSlideMotor");
+        rightSlideMotor = hwMap.get(DcMotorEx.class, "rightSlideMotor");
         rightSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
@@ -105,19 +110,30 @@ public class Arm {
         //move elbow servo to 0 degress
 
         //set the linear slide motors to reverse direction
-        powerSlides(-1);
+        powerSlides(10);
 
     }
 
     //position true means extended, position false means retracted
-    public void powerSlides(int position) {
+    //assumes the motors are connected to two encoder slots, in the scenario, they aren't we may have to adjust
+    public void powerSlides(int ticksToBeMoved) {
+
+        slideMoving = true;
+
+        leftSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
-        leftSlideMotor.setTargetPosition(position); // the position you want the slides to reach
+        // set the tolerance of the leftSlide motor
+        leftSlideMotor.setTargetPositionTolerance(13);
+        rightSlideMotor.setTargetPositionTolerance(13);
 
-        rightSlideMotor.setTargetPosition(position);
+        // perform the control loop
+        leftSlideMotor.setPower(1);
         rightSlideMotor.setPower(1);
     }
+
+
 
 
 
