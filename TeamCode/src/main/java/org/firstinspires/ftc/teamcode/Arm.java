@@ -45,15 +45,18 @@ public class Arm {
         isPressed = gamePad;
         return lastPressed;
     }
-    /* public void closeClaw() {
+
+
+    public void closeClaw() {
         leftClawMotor.setPosition(leftClosePositionValue);
         rightClawMotor.setPosition(rightClosePositionValue);
     }
     public void openClaw() { //ignore this
         leftClawMotor.setPosition(leftOpenPositionValue);
         rightClawMotor.setPosition(rightOpenPositionValue);
-    } */
+    }
 
+    /*
     public void openClaw() {
         double unroundedCurrentLCP = leftClawMotor.getPosition();
         double currentLCP = Math.round(unroundedCurrentLCP * 10) / 10.0;
@@ -88,7 +91,7 @@ public class Arm {
             double RCError = rightClosePositionValue - currentRCP;
             leftClawMotor.setPosition(RCError);
         }
-    }
+    } */
 
 
 
