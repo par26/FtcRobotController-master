@@ -136,6 +136,30 @@ public class Arm {
         rightSlideMotor.setPower(1);
     }
 
+    public void powerSlidesUp() {
+        leftSlideMotor.setPower(.7);
+        rightSlideMotor.setPower(.7);
+    }
+
+    public void powerSlides(double power) {
+        int pos = leftSlideMotor.getCurrentPosition();
+        while(pos >= 10 || pos <= 1000) {
+            leftSlideMotor.setPower(power);
+            rightSlideMotor.setPower(power);
+        }
+
+    }
+
+    public void stopSlides() {
+        leftSlideMotor.setPower(0);
+        rightSlideMotor.setPower(0);
+    }
+
+    public void powerSlidesDown() {
+        leftSlideMotor.setPower(-0.7);
+        rightSlideMotor.setPower(-0.7);
+    }
+
 
 
 

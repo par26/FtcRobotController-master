@@ -1,6 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+
+
+
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.Gamepad;
+
+import java.util.List;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TeleOp extends OpMode {
@@ -9,12 +16,20 @@ public class TeleOp extends OpMode {
     MechanumDrive drive = new MechanumDrive();
     Arm arm = new Arm();
 
+    boolean lastBumperMovement, currBumperMovement;
+
+    List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+
+
+
     enum State {
-        START,
-        WAIT_FOR_SENSOR_RELEASE,
-        WAIT_FOR_POT_TURN,
-        STOP,
-        DONE
+        FULL_CONTROL_FWD,
+
+        CLAW_MOVING,
+
+        RETRACTING,
+
+        FULL_CONTROL_BACK,
     }
 
     State state;
@@ -23,7 +38,14 @@ public class TeleOp extends OpMode {
 
         drive.init(hardwareMap);
         arm.init(hardwareMap);
-        state = State.START;
+        state = State.FULL_CONTROL_FWD;
+
+        lastBumperMovement = false;
+        currBumperMovement = false;
+
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
     }
 
     @Override
@@ -36,16 +58,21 @@ public class TeleOp extends OpMode {
 
         drive.drive(forward, right, rotate);
 
-        boolean clawPosition = true;
 
-        if (arm.isButtonPressedChecker(gamepad1.a)) { // these if statements closes/opens claw
-            state = State.WAIT_FOR_POT_TURN;
-            clawPosition = !clawPosition;
-            if (clawPosition) {
-                arm.closeClaw();
-            } else {
-                arm.openClaw();
-            }}
+        lastBumperMovement = currBumperMovement;
+
+        if(gamepad1.left_bumper) {
+            arm.powerSlides(-.7);
+        } else if(gamepad1.right_bumper) {
+            arm.powerSlides(.7);
+        } else {
+            arm.stopSlides();
+        }
+
+
+
+
+
 
     }
 }
