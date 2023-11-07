@@ -16,7 +16,7 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetectPixel implements VisionProcessor {
+public class DetectTeamProp implements VisionProcessor {
 
     Mat submat = new Mat();
     Mat hsvMat = new Mat();
