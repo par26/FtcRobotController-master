@@ -34,10 +34,35 @@ public class TeleOp extends OpMode {
 
     //rising edge for the b button
     boolean pb, cb = false;
+
     //rising edge for the a button
     boolean pa, ca = false;
-    //previous left trigger
+
+    //rising edge for the x button
+    boolean px, cx = false;
+
+    //rising edge for the y button
+    boolean py, cy = false;
+
+    //rising edge for left trigger
     boolean plt, clt = false;
+
+    //rising edge for right trigger
+    boolean prt, crt = false;
+
+    //rising edge for the left bumper
+    boolean plb, clb = false;
+
+    //rising edge for right bumper
+    boolean prb, crb = false;
+
+    //rising edge for back button
+    boolean pbb, cbb = false;
+
+    //rising edge for start button
+    boolean psb, csb = false;
+
+
     //rising edge for the
 
     @Override
@@ -65,22 +90,26 @@ public class TeleOp extends OpMode {
             switch (state) {
                 case FULL_CONTROL_FWD:
 
-                    boolean lastClawMovement = false, currClawMovement = false;
-                    if(gamepad1.b) {
+                    pb = cb;
+                    cb = gamepad1.b;
+                    if(cb && !pb) {
                         arm.closeClaw();
                     }
-
-                    if(gamepad1.left_bumper) {
+                    plb = clb;
+                    clb = gamepad1.left_bumper;
+                    if(clb && !prb) {
                         arm.powerSlides(-.7);
                         //adjust the elbow's angle based on the linear slide's position
-                    } else if(gamepad1.right_bumper) {
+                    } else if(crb && !prb) {
                         arm.powerSlides(.7);
                     } else {
                         arm.stopSlides();
                     }
 
+                    px = cx;
+                    cx = gamepad1.x;
 
-                    if(gamepad1.x) {
+                    if(cx && !px) {
                         arm.retractArm();
                     }
 
@@ -90,26 +119,34 @@ public class TeleOp extends OpMode {
 
                 case FULL_CONTROL_BACK:
 
-                    if(gamepad1.b) {
+                    pb = cb;
+                    cb = gamepad1.b;
+
+                    if(cb && !pb) {
                         arm.openClaw();
                     }
 
-                    if(gamepad1.left_bumper) {
+                    plb = clb;
+                    clb = gamepad1.left_bumper;
+
+                    if(clb && !plb) {
                         arm.powerSlides(-.7);
-                    } else if(gamepad1.right_bumper) {
+                    } else if(crb && !prb) {
                         arm.powerSlides(.7);
                     } else {
                         arm.stopSlides();
                     }
 
-                    if(gamepad1.left_bumper) {
+                    if(clb && !plb) {
                         arm.powerSlides(-.7);
-                    } else if(gamepad1.right_bumper) {
+                    } else if(crb && !prb) {
                         arm.powerSlides(.7);
                     } else {
                         arm.stopSlides();
                     }
 
+                    px = cx;
+                    cx = gamepad1.x;
                     if(gamepad1.x) {
                         arm.retractArm();
                     }
