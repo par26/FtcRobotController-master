@@ -47,8 +47,8 @@ public class DetectTeamProp implements VisionProcessor {
         }
 
         // lenient bounds will filter out near yellow, this should filter out all near yellow things(tune this if needed)
-        Scalar lowHSV = new Scalar(20, 70, 80); // lenient lower bound HSV for yellow
-        Scalar highHSV = new Scalar(0, 0, 255); // lenient higher bound HSV for yellow
+        Scalar lowHSV = new Scalar(0, 0, 0); // lenient lower bound HSV for yellow
+        Scalar highHSV = new Scalar(255, 255, 255); // lenient higher bound HSV for yellow
 
         Mat thresh = new Mat();
 

@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class MechanumDrive {
     private DcMotor frontRightMotor;
@@ -18,8 +21,11 @@ public class MechanumDrive {
         frontRightMotor = hardwareMap.get(DcMotor.class, "front_right_motor");
         backLeftMotor = hardwareMap.get(DcMotor.class, "back_left_motor");
         backRightMotor = hardwareMap.get(DcMotor.class, "back_right_motor");
+        imu = hardwareMap.get(IMU.class, "imu");
 
+        RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.RIGHT);
 
+        imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
 
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -55,6 +61,22 @@ public class MechanumDrive {
         double backLeftPower = forward - right + rotate;
         double backRightPower = forward + right - rotate;
         setPowers(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
+    }
+
+    public void driveFieldRelative(double forward, double right, double rotate) {
+        double robotAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+        //convert to polar
+        double theta = Math.atan2(forward, right);
+
+        double r = Math.hypot(forward, right);
+
+        theta = AngleUnit.normalizeRadians(theta - robotAngle);
+
+        double newForward = r * Math.sin(theta);
+        double newRight = r * Math.cos(theta);
+
+        this.drive(newForward, newRight, rotate);
     }
 
     //add function to set robot at specific angle

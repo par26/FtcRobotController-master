@@ -80,12 +80,7 @@ public class TeleOp extends OpMode {
     @Override
         public void loop() {
 
-            double forward = -gamepad1.left_stick_y;
-            double right = gamepad1.left_stick_x;
 
-            double rotate = gamepad1.right_stick_x;
-
-            drive.drive(forward, right, rotate);
 
             switch (state) {
                 case FULL_CONTROL_FWD:
@@ -97,6 +92,10 @@ public class TeleOp extends OpMode {
                     }
                     plb = clb;
                     clb = gamepad1.left_bumper;
+
+                    prb = crb;
+                    crb = gamepad1.right_bumper;
+
                     if(clb && !prb) {
                         arm.powerSlides(-.7);
                         //adjust the elbow's angle based on the linear slide's position
@@ -129,13 +128,8 @@ public class TeleOp extends OpMode {
                     plb = clb;
                     clb = gamepad1.left_bumper;
 
-                    if(clb && !plb) {
-                        arm.powerSlides(-.7);
-                    } else if(crb && !prb) {
-                        arm.powerSlides(.7);
-                    } else {
-                        arm.stopSlides();
-                    }
+                    prb = crb;
+                    crb = gamepad1.right_bumper;
 
                     if(clb && !plb) {
                         arm.powerSlides(-.7);
@@ -144,6 +138,8 @@ public class TeleOp extends OpMode {
                     } else {
                         arm.stopSlides();
                     }
+
+
 
                     px = cx;
                     cx = gamepad1.x;
@@ -158,7 +154,12 @@ public class TeleOp extends OpMode {
 
             }
 
+        double forward = -gamepad1.left_stick_y;
+        double right = gamepad1.left_stick_x;
 
+        double rotate = gamepad1.right_stick_x;
+
+        drive.driveFieldRelative(forward, right, rotate);
 
         }
 }

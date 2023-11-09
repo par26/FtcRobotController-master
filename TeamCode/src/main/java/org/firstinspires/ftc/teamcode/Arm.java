@@ -134,7 +134,7 @@ public class Arm {
     //calcs the position the elbow and linear slides have to be in order to reach height
     //height is between the values 0-1 ig. 0 lowest height, 1 max height
     public void clawReachHeight(double height) {
-        double targetAngle = ;
+        double targetAngle;
         double targetHeight;
 
 
@@ -212,10 +212,12 @@ public class Arm {
     }
 
     public void powerSlides(double power) {
-        int pos = leftSlideMotor.getCurrentPosition();
         leftSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        while(pos >= 2 || pos <= MAX_POSITION) {
+
+        //use the pid to determien what power to set the slides
+        //multiply it by the power variable (-1, 1) as it will the be the velocity varialbe
+        while(leftSlideMotor.getCurrentPosition() >= 2 || leftSlideMotor.getCurrentPosition() <= MAX_POSITION) {
             leftSlideMotor.setPower(power);
             rightSlideMotor.setPower(power);
         }
@@ -223,6 +225,7 @@ public class Arm {
     }
 
     public void stopSlides() {
+        leftSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftSlideMotor.setPower(0);
         rightSlideMotor.setPower(0);
     }
