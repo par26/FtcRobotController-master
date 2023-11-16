@@ -17,12 +17,7 @@ public class Arm {
         Servo rightClawServo;
 
         DcMotor leftSlideMotor;
-
         DcMotor rightSlideMotor;
-
-    DcMotor leftSlideMotor;
-
-    DcMotor rightSlideMotor;
 
     public void init(HardwareMap hwMap) {
         rightClawServo = hwMap.get(Servo.class, "leftClaw");
@@ -46,7 +41,7 @@ public class Arm {
         }
 
 
-        public void openClaw() {
+        /* public void openClaw() {
                 double unroundedCurrentLCP = leftClawServo.getPosition();
                 double currentLCP = Math.round(unroundedCurrentLCP * 10) / 10.0;
 
@@ -86,7 +81,7 @@ public class Arm {
                         currentRCP = currentRCP + RCError;
                         leftClawServo.setPosition(currentRCP);
                 }
-        }
+        } */
 
 
 
