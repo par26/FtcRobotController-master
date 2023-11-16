@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.vision;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,6 +11,7 @@ import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
@@ -21,8 +24,13 @@ public class DetectTeamProp implements VisionProcessor {
     Mat submat = new Mat();
     Mat hsvMat = new Mat();
 
+    Telemetry telemetry;
+
     Mat thresh = new Mat();
 
+    double blueThreshold = 0.5;
+
+    public String outStr = "";
 
     //backlog of frames to average out to reduce noise
     ArrayList<double[]> frameList;
@@ -30,7 +38,21 @@ public class DetectTeamProp implements VisionProcessor {
     public static double strictLowS = 140;
     public static double strictHighS = 255;
 
+    static final Rect LEFT_RECTANGLE = new Rect(
+            new Point(0, 0),
+            new Point(0, 0)
+    );
 
+    static final Rect RIGHT_RECTANGLE = new Rect(
+            new Point(0, 0),
+            new Point(0, 0)
+    );
+
+
+
+    public DetectTeamProp(Telemetry telemetry) {
+        this.telemetry = telemetry;
+    }
     @Override
     public void init(int width, int height, CameraCalibration calibration) {
         frameList = new ArrayList<>();
@@ -47,8 +69,8 @@ public class DetectTeamProp implements VisionProcessor {
         }
 
         // lenient bounds will filter out near yellow, this should filter out all near yellow things(tune this if needed)
-        Scalar lowHSV = new Scalar(0, 0, 0); // lenient lower bound HSV for yellow
-        Scalar highHSV = new Scalar(255, 255, 255); // lenient higher bound HSV for yellow
+        Scalar lowHSV = new Scalar(100, 58, 0); // lenient lower bound HSV for yellow
+        Scalar highHSV = new Scalar(130, 255, 255); // lenient higher bound HSV for yellow
 
         Mat thresh = new Mat();
 
@@ -64,13 +86,13 @@ public class DetectTeamProp implements VisionProcessor {
 
         Mat scaledMask = new Mat();
         //scale the average saturation to 150
-        masked.convertTo(scaledMask, -1, 150 / average.val[1], 0);
+        masked.convertTo(scaledMask, -1, 200 / average.val[1], 0);
 
 
         Mat scaledThresh = new Mat();
         //you probably want to tune this
-        Scalar strictLowHSV = new Scalar(0, strictLowS, 0); //strict lower bound HSV for yellow
-        Scalar strictHighHSV = new Scalar(255, strictHighS, 255); //strict higher bound HSV for yellow
+        Scalar strictLowHSV = new Scalar(50, strictLowS, 0); //strict lower bound HSV for yellow
+        Scalar strictHighHSV = new Scalar(245, strictHighS, 255); //strict higher bound HSV for yellow
         //apply strict HSV filter onto scaledMask to get rid of any yellow other than pole
         Core.inRange(scaledMask, strictLowHSV, strictHighHSV, scaledThresh);
 
@@ -93,6 +115,24 @@ public class DetectTeamProp implements VisionProcessor {
             frameList.remove(0);
         }
 
+        double leftBox = Core.sumElems(finalMask.submat(LEFT_RECTANGLE)).val[0];
+        double rightBox = Core.sumElems(finalMask.submat(RIGHT_RECTANGLE)).val[0];
+
+        double averagedLeftBox = leftBox / LEFT_RECTANGLE.area() / 255;
+        double averagedRightBox = rightBox / RIGHT_RECTANGLE.area() / 255; //Makes value [0,1]
+
+
+        if(averagedLeftBox > blueThreshold) {
+            outStr = "left";
+        } else if(averagedRightBox > blueThreshold) {
+            outStr = "center";
+        } else {
+            outStr = "right";
+        }
+
+
+        telemetry.addData("[Location]", outStr);
+        telemetry.update();
 
         //release all the data
         frame.release();
@@ -109,7 +149,7 @@ public class DetectTeamProp implements VisionProcessor {
         // return thresh;
         // note that you must not do thresh.release() if you want to return thresh
         // you also need to release the frame if you return thresh(release as much as possible)
-        return frame;
+        return thresh;
     }
 
 
@@ -132,5 +172,8 @@ public class DetectTeamProp implements VisionProcessor {
         rectPaint.setStrokeWidth(scaleCanvasDensity * 4);
 
         canvas.drawRect(makeGraphicsRect(rect, scaleBmpPxToCanvasPx), rectPaint);
+
+        //canvas.drawRect(LEFT_RECTANGLE, rectPaint);
+        //canvas.drawRect(RIGHT_RECTANGLE, rectPaint);
     }
 }

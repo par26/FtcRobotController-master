@@ -23,12 +23,13 @@ public class MechanumDrive {
         backRightMotor = hardwareMap.get(DcMotor.class, "back_right_motor");
         imu = hardwareMap.get(IMU.class, "imu");
 
-        RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.RIGHT);
+        RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP);
 
         imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
 
-        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        //frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        //backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -37,7 +38,7 @@ public class MechanumDrive {
     }
 
     private void setPowers(double frontRightPower, double frontLeftPower, double backLeftPower, double backRightPower) {
-        double maxSpeed = 1.0;
+        double maxSpeed = .85;
 
         maxSpeed = Math.max(maxSpeed, Math.abs(frontLeftPower));
         maxSpeed = Math.max(maxSpeed, Math.abs(frontRightPower));
@@ -49,10 +50,10 @@ public class MechanumDrive {
         backLeftPower /= maxSpeed;
         backRightPower /= maxSpeed;
 
-        frontLeftMotor.setPower(frontLeftPower);
-        frontRightMotor.setPower(frontRightPower);
-        backLeftMotor.setPower(backLeftPower);
-        backRightMotor.setPower(backRightPower);
+        frontLeftMotor.setPower(frontLeftPower * 85);
+        frontRightMotor.setPower(frontRightPower * 85);
+        backLeftMotor.setPower(backLeftPower * .85);
+        backRightMotor.setPower(backRightPower * .85);
     }
 
     public void drive(double forward, double right, double rotate) {
