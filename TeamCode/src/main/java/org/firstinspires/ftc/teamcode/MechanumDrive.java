@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class MechanumDrive {
     private DcMotor frontRightMotor;
@@ -18,11 +21,15 @@ public class MechanumDrive {
         frontRightMotor = hardwareMap.get(DcMotor.class, "front_right_motor");
         backLeftMotor = hardwareMap.get(DcMotor.class, "back_left_motor");
         backRightMotor = hardwareMap.get(DcMotor.class, "back_right_motor");
+        imu = hardwareMap.get(IMU.class, "imu");
 
+        RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP);
 
+        imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
 
-        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        //frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        //backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -31,7 +38,7 @@ public class MechanumDrive {
     }
 
     private void setPowers(double frontRightPower, double frontLeftPower, double backLeftPower, double backRightPower) {
-        double maxSpeed = 1.0;
+        double maxSpeed = .85;
 
         maxSpeed = Math.max(maxSpeed, Math.abs(frontLeftPower));
         maxSpeed = Math.max(maxSpeed, Math.abs(frontRightPower));
@@ -43,10 +50,10 @@ public class MechanumDrive {
         backLeftPower /= maxSpeed;
         backRightPower /= maxSpeed;
 
-        frontLeftMotor.setPower(frontLeftPower);
-        frontRightMotor.setPower(frontRightPower);
-        backLeftMotor.setPower(backLeftPower);
-        backRightMotor.setPower(backRightPower);
+        frontLeftMotor.setPower(frontLeftPower * 85);
+        frontRightMotor.setPower(frontRightPower * 85);
+        backLeftMotor.setPower(backLeftPower * .85);
+        backRightMotor.setPower(backRightPower * .85);
     }
 
     public void drive(double forward, double right, double rotate) {
@@ -55,6 +62,22 @@ public class MechanumDrive {
         double backLeftPower = forward - right + rotate;
         double backRightPower = forward + right - rotate;
         setPowers(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
+    }
+
+    public void driveFieldRelative(double forward, double right, double rotate) {
+        double robotAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+        //convert to polar
+        double theta = Math.atan2(forward, right);
+
+        double r = Math.hypot(forward, right);
+
+        theta = AngleUnit.normalizeRadians(theta - robotAngle);
+
+        double newForward = r * Math.sin(theta);
+        double newRight = r * Math.cos(theta);
+
+        this.drive(newForward, newRight, rotate);
     }
 
     //add function to set robot at specific angle
