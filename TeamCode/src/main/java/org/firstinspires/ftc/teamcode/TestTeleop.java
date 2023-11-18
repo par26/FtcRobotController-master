@@ -89,10 +89,10 @@ public class TestTeleop extends OpMode {
         telemetry.update();
 
 
-        double forward = -gamepad1.left_stick_y * 1.2;
-        double rotate = gamepad1.left_stick_x * .8;
+        double forward = drive.squareInput(-gamepad1.left_stick_y * 1.2);
+        double rotate = drive.squareInput(gamepad1.left_stick_x * .8);
 
-        double right = -gamepad1.right_stick_x;
+        double right = -drive.squareInput(gamepad1.right_stick_x);
 
         drive.drive(forward, right, rotate);
 
