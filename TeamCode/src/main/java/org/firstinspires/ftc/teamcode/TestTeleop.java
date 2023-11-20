@@ -99,6 +99,10 @@ public class TestTeleop extends OpMode {
 
     }
 
+    public void moveSlowly(double targetPos, double delay) {
+
+    }
+
     @Override
     public void stop() {
         //Happens once after stop
