@@ -4,51 +4,56 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
+
 public class TestTeleop extends OpMode {
-
-    Servo servo;
-    Servo servo2;
-    //Servo for paper plane launcher
-    Servo servo3;
-
-    boolean pa, ca = false;
-
-    boolean pb, cb = false;
-
-    boolean px, cx = false;
 
     MechanumDrive drive = new MechanumDrive();
 
+    boolean pb, cb = false;
+
+    //rising edge for the a button
+    boolean pa, ca = false;
+
+    //rising edge for the x button
+    boolean px, cx = false;
+
+    //rising edge for the y button
+    boolean py, cy = false;
+
+    //rising edge for left trigger
+    boolean plt, clt = false;
+
+    //rising edge for right trigger
+    boolean prt, crt = false;
+
+    //rising edge for the left bumper
+    boolean plb, clb = false;
+
+    //rising edge for right bumper
+    boolean prb, crb = false;
+
+    //rising edge for back button
+    boolean pbb, cbb = false;
+
+    //rising edge for start button
+    boolean psb, csb = false;
+
+    Servo leftClaw;
+    Servo rightClaw;
 
 
     @Override
     public void init() {
-        //servo = hardwareMap.get(Servo.class, "testServo1");
-        //servo2 = hardwareMap.get(Servo.class, "testServo2");
-        servo3 = hardwareMap.get(Servo.class, "testServo3");
-        drive.init(hardwareMap);
+        leftClaw = hardwareMap.get(Servo.class, "leftClaw");
 
+        rightClaw = hardwareMap.get(Servo.class, "rightClaw");
 
-        //servo.scaleRange(0.75, 0);
-        //servo2.scaleRange(0, 0.75);
-        //servo3.scaleRange(0,1);  //adjust the position to release the lock
+        leftClaw.scaleRange(0.20, 0.448);
+        rightClaw.scaleRange(0.20, 0.448);
 
-        //motor2.setDirection(Servo.Direction.REVERSE);
-        //servo.setPosition(0);
-        //servo2.setPosition(0);
-        //servo3.setPosition(0);
+        leftClaw.setPosition(1);
+        rightClaw.setPosition(0);
 
-
-
-        servo3.setDirection(Servo.Direction.REVERSE);
-        servo3.setPosition(0);
-
-        // testing purpose
-        //paper plane starting position
-
-        double position = servo3.getPosition();
-        telemetry.addData("position", position);
-        telemetry.update();
     }
 
     @Override
@@ -59,22 +64,57 @@ public class TestTeleop extends OpMode {
     @Override
     public void loop() {
 
-
-        /* pa = ca;
-        ca = gamepad1.a;
-        if(ca && !pa) {
-            servo.setPosition(1);
-            servo2.setPosition(1);
+        //Open left
+        px = cx;
+        cx = gamepad1.x;
+        if (cx && !px) {
+            leftClaw.setPosition(1);
+            double lpos = leftClaw.getPosition();
+            telemetry.addData("Position Left", lpos);
+            telemetry.update();
+            rightClaw.setPosition(0);
+            double rpos = rightClaw.getPosition();
+            telemetry.addData("Position Right:", rpos);
+            telemetry.update();
         }
 
+        //Close left
+        pa = ca;
+        ca = gamepad1.a;
+        if (ca && !pa) {
+            leftClaw.setPosition(0);
+            double pos = leftClaw.getPosition();
+            telemetry.addData("Position Left", pos);
+            telemetry.update();
+            rightClaw.setPosition(1);
+            double rpos = rightClaw.getPosition();
+            telemetry.addData("Position right", rpos);
+            telemetry.update();
+        }
+
+        /*//Open Right
+        py = cy;
+        cy = gamepad1.y;
+        if (cy && !py) {
+            rightClaw.setPosition(0);
+            double rpos = rightClaw.getPosition();
+            telemetry.addData("Position Right:", rpos);
+            telemetry.update();
+
+        }
+        //Close right
         pb = cb;
         cb = gamepad1.b;
-        if(cb && !pb) {
-            servo.setPosition(0);
-            servo2.setPosition(0);
+        if (cb && !pb) {
+            rightClaw.setPosition(1);
+            double rpos = rightClaw.getPosition();
+            telemetry.addData("Position right", rpos);
+            telemetry.update();
         } */
 
-        px = cx;
+
+
+        /* px = cx;
         cx = gamepad1.a;
         if(gamepad1.a) {
             servo3.setPosition(1);
@@ -86,26 +126,14 @@ public class TestTeleop extends OpMode {
 
         double position = servo3.getPosition();
         telemetry.addData("position", position);
-        telemetry.update();
+        telemetry.update(); */
 
-
-        double forward = -gamepad1.left_stick_y * 1.2;
-        double rotate = gamepad1.left_stick_x * .8;
-
-        double right = -gamepad1.right_stick_x;
-
-        drive.drive(forward, right, rotate);
 
 
     }
 
-    @Override
-    public void stop() {
-        //Happens once after stop
-        servo3.setPosition(0);
-    }
-
-
-
+    //@Override
+    //public void stop(); {
+    //Happens once after stop
 
 }
