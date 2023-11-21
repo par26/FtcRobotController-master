@@ -128,9 +128,27 @@ public class TestTeleop extends OpMode {
         telemetry.addData("position", position);
         telemetry.update(); */
 
+        double forward = drive.squareInput(-gamepad1.left_stick_y * 1.2);
+        double rotate = drive.squareInput(gamepad1.left_stick_x * .8);
+
+        double right = -drive.squareInput(gamepad1.right_stick_x);
+
+        drive.drive(forward, right, rotate);
 
 
     }
+
+    public void moveSlowly(double targetPos, double delay) {
+
+    }
+
+    @Override
+    public void stop() {
+        //Happens once after stop
+
+    }
+
+
 
     //@Override
     //public void stop(); {
