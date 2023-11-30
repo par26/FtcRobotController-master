@@ -8,6 +8,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoControllerEx;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.utils.PIDController;
 
@@ -17,11 +20,12 @@ public class Arm {
     double rightOpenPositionValue; //declaring servo's open position value so easily manipulable
     double rightClosePositionValue; //declaring servo's close position value so easily manipulable
 
+
     boolean clawClosed;
 
     boolean retracted = true;
-    Servo leftClawMotor;
-    Servo rightClawMotor;
+    ServoImplEx leftClawMotor;
+    ServoImplEx rightClawMotor;
 
     Servo rotateClaw;
 
@@ -54,9 +58,9 @@ public class Arm {
 
     boolean slideMoving;
     public void init(HardwareMap hwMap) {
-        rightClawMotor = hwMap.get(Servo.class, "rightClaw");
-        leftClawMotor = hwMap.get(Servo.class, "leftClaw");
-        rotateClaw =  hwMap.get(Servo.class, "rotateClaw");
+        rightClawMotor = hwMap.get(ServoImplEx.class, "rightClaw");
+        leftClawMotor = hwMap.get(ServoImplEx.class, "leftClaw");
+        rotateClaw =  2hwMap.get(Servo.class, "rotateClaw");
 
         rightElbowMotor = hwMap.get(Servo.class, "rightElbowMotor");
         leftElbowMotor = hwMap.get(Servo.class, "leftElbowMotor");
@@ -88,11 +92,14 @@ public class Arm {
         rightClawMotor.setPosition(rightClosePositionValue);
         clawClosed = true;
     }
-    public void openClaw() { //ignore this
-        leftClawMotor.setPosition(leftOpenPositionValue);
-        rightClawMotor.setPosition(rightOpenPositionValue);
+    public void openClaw() {//ignore this
+
+        leftClawMotor.setPosition(1);
+        rightClawMotor.setPosition(1);
         clawClosed = false;
     }
+
+
 
     /*
     public void openClaw() {
@@ -184,7 +191,9 @@ public class Arm {
 
 
 
-
+    public void servoMoveSlow(double targetPos, double delay) {
+        leftClawMotor.set()
+    }
 
     //position true means extended, position false means retracted
     //assumes the motors are connected to two encoder slots, in the scenario, they aren't we may have to adjust

@@ -6,6 +6,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.ServoController;
+import com.qualcomm.robotcore.hardware.ServoControllerEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.List;
 
@@ -15,6 +19,8 @@ public class TeleOp extends OpMode {
     //ProgrammingBoard board = new ProgrammingBoard();
     MechanumDrive drive = new MechanumDrive();
     Arm arm = new Arm();
+
+    ElapsedTime timer = new ElapsedTime();
 
 
 
@@ -122,6 +128,14 @@ public class TeleOp extends OpMode {
                     cb = gamepad1.b;
 
                     if(cb && !pb) {
+                        timer.reset();
+                        //change logic LATER USING MATH>ROUND
+                        if(timer.milliseconds() / 0.2 == 1) {
+                            arm.leftClawMotor.setPwmDisable();
+                            arm.rightClawMotor.setPwmDisable();
+                        } else {
+
+                        }
                         arm.openClaw();
                     }
 
