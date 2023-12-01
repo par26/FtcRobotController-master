@@ -69,6 +69,7 @@ public class TeleOp extends OpMode {
     boolean psb, csb = false;
 
 
+    final double armManualDeadband = 0.03;
     //rising edge for the
 
     @Override
@@ -91,31 +92,17 @@ public class TeleOp extends OpMode {
             switch (state) {
                 case FULL_CONTROL_FWD:
 
-                    pb = cb;
-                    cb = gamepad1.b;
-                    if(cb && !pb) {
+                    pa = ca;
+                    ca = gamepad1.a;
+                    if(ca && !pa) {
                         arm.closeClaw();
-                    }
-                    plb = clb;
-                    clb = gamepad1.left_bumper;
-
-                    prb = crb;
-                    crb = gamepad1.right_bumper;
-
-                    if(clb && !prb) {
-                        arm.powerSlides(-.7);
-                        //adjust the elbow's angle based on the linear slide's position
-                    } else if(crb && !prb) {
-                        arm.powerSlides(.7);
-                    } else {
-                        arm.stopSlides();
                     }
 
                     px = cx;
                     cx = gamepad1.x;
 
                     if(cx && !px) {
-                        arm.retractArm();
+                        arm.extendArm();
                     }
 
                     if(arm.retracted) {
@@ -128,32 +115,8 @@ public class TeleOp extends OpMode {
                     cb = gamepad1.b;
 
                     if(cb && !pb) {
-                        timer.reset();
-                        //change logic LATER USING MATH>ROUND
-                        if(timer.milliseconds() / 0.2 == 1) {
-                            arm.leftClawMotor.setPwmDisable();
-                            arm.rightClawMotor.setPwmDisable();
-                        } else {
-
-                        }
                         arm.openClaw();
                     }
-
-                    plb = clb;
-                    clb = gamepad1.left_bumper;
-
-                    prb = crb;
-                    crb = gamepad1.right_bumper;
-
-                    if(clb && !plb) {
-                        arm.powerSlides(-.7);
-                    } else if(crb && !prb) {
-                        arm.powerSlides(.7);
-                    } else {
-                        arm.stopSlides();
-                    }
-
-
 
                     px = cx;
                     cx = gamepad1.x;
@@ -161,19 +124,28 @@ public class TeleOp extends OpMode {
                         arm.retractArm();
                     }
 
-                    if(arm.retracted == false) {
+                    if(!arm.retracted) {
                         state = State.FULL_CONTROL_FWD;
                     }
 
 
             }
 
-        double forward = -gamepad1.left_stick_y;
-        double right = gamepad1.left_stick_x;
 
-        double rotate = gamepad1.right_stick_x;
 
+        double forward = drive.squareInput(-gamepad1.left_stick_y * 1.2);
+        double rotate = drive.squareInput(gamepad1.left_stick_x * .8);
+
+        double right = -drive.squareInput(gamepad1.right_stick_x);
+
+        drive.drive(forward, right, rotate);
+
+
+        double slidePower = gamepad1.right_trigger -  gamepad1.left_trigger;
         //drive.driveFieldRelative(forward, right, rotate);
+        if (Math.abs(slidePower) > armManualDeadband) {
+            arm.powerSlides(slidePower);
+        }
 
         }
 }

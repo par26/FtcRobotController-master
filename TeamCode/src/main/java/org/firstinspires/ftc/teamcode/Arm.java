@@ -24,14 +24,14 @@ public class Arm {
     boolean clawClosed;
 
     boolean retracted = true;
-    ServoImplEx leftClawMotor;
-    ServoImplEx rightClawMotor;
+    ServoImplEx leftClawServo;
+    ServoImplEx rightClawServo;
 
-    Servo rotateClaw;
+    ServoImplEx leftElbowServo;
+    ServoImplEx rightElbowServo;
 
 
-    Servo leftElbowMotor;
-    Servo rightElbowMotor;
+
     DcMotorEx leftSlideMotor;
 
     DcMotorEx rightSlideMotor;
@@ -49,6 +49,8 @@ public class Arm {
     //Claw Length in METERS
     public final double CLAW_LENGTH =.238;
 
+    private final double MAX_RETRACT_ANGLE = 200.0/360.0;
+
     //The Minimum angle the Elbow can be
     public final double ELBOW_MIN_ANGLE = -13.7;
 
@@ -58,12 +60,21 @@ public class Arm {
 
     boolean slideMoving;
     public void init(HardwareMap hwMap) {
-        rightClawMotor = hwMap.get(ServoImplEx.class, "rightClaw");
-        leftClawMotor = hwMap.get(ServoImplEx.class, "leftClaw");
-        rotateClaw =  2hwMap.get(Servo.class, "rotateClaw");
+        rightClawServo = hwMap.get(ServoImplEx.class, "rightClawServo");
+        leftClawServo = hwMap.get(ServoImplEx.class, "leftClawServo");
 
-        rightElbowMotor = hwMap.get(Servo.class, "rightElbowMotor");
-        leftElbowMotor = hwMap.get(Servo.class, "leftElbowMotor");
+
+        rightClawServo.scaleRange(0.2, .45);
+        leftClawServo.scaleRange(0.2, .45);
+
+
+
+        leftClawServo.setDirection(Servo.Direction.REVERSE);
+        rightElbowServo = hwMap.get(ServoImplEx.class, "rightElbowServo");
+        leftElbowServo = hwMap.get(ServoImplEx.class, "leftElbowServo");
+
+        rightElbowServo.scaleRange(0, MAX_RETRACT_ANGLE);
+        leftElbowServo.scaleRange(0, MAX_RETRACT_ANGLE);
 
         leftSlideMotor = hwMap.get(DcMotorEx.class, "leftSlideMotor");
         leftSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -72,6 +83,9 @@ public class Arm {
         rightSlideMotor = hwMap.get(DcMotorEx.class, "rightSlideMotor");
         rightSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftClawServo.setPosition(0);
+        rightClawServo.setPosition(0);
 
         clawClosed = false;
     }
@@ -88,14 +102,14 @@ public class Arm {
 
 
     public void closeClaw() {
-        leftClawMotor.setPosition(leftClosePositionValue);
-        rightClawMotor.setPosition(rightClosePositionValue);
+        leftClawServo.setPosition(leftClosePositionValue);
+        rightClawServo.setPosition(rightClosePositionValue);
         clawClosed = true;
     }
     public void openClaw() {//ignore this
 
-        leftClawMotor.setPosition(1);
-        rightClawMotor.setPosition(1);
+        leftClawServo.setPosition(1);
+        rightClawServo.setPosition(1);
         clawClosed = false;
     }
 
@@ -153,15 +167,15 @@ public class Arm {
         //set linear slide motors to x position
         powerSlides(1);
 
-        rotateClaw.setPosition(0);
 
-        leftElbowMotor.setDirection(Servo.Direction.FORWARD);
-        rightElbowMotor.setDirection(Servo.Direction.FORWARD);
 
-        leftElbowMotor.setPosition(0);
-        rightElbowMotor.setPosition(0);
+        leftElbowServo.setDirection(Servo.Direction.FORWARD);
+        rightElbowServo.setDirection(Servo.Direction.FORWARD);
 
-        if(Math.abs(leftElbowMotor.getPosition()) < .05 && Math.abs(rotateClaw.getPosition()) < 0.1) {
+        leftElbowServo.setPosition(0);
+        rightElbowServo.setPosition(0);
+
+        if(Math.abs(leftElbowServo.getPosition()) < .05 ) {
             retracted = true;
         }
 
@@ -170,20 +184,15 @@ public class Arm {
     //the moves the claw arm downward to resting position
     public void extendArm() {
 
-        //twist the claw servo by 180 degrees
-
-        leftElbowMotor.setDirection(Servo.Direction.REVERSE);
-        rightElbowMotor.setDirection(Servo.Direction.REVERSE);
 
         //
-        leftElbowMotor.setPosition(EXTEND_ARM_POS);
-        rightElbowMotor.setPosition(EXTEND_ARM_POS);
+        leftElbowServo.setPosition(1);
+        rightElbowServo.setPosition(1);
 
         //move rotate claw servo to 180 degress
 
-        rotateClaw.setPosition(0.6);
 
-        if(Math.abs(leftElbowMotor.getPosition() - EXTEND_ARM_POS) < .05 && Math.abs(rotateClaw.getPosition() - 0.6) < 0.1) {
+        if(Math.abs(leftElbowServo.getPosition() - EXTEND_ARM_POS)  < 0.1) {
             retracted = false;
         }
 
@@ -192,7 +201,7 @@ public class Arm {
 
 
     public void servoMoveSlow(double targetPos, double delay) {
-        leftClawMotor.set()
+
     }
 
     //position true means extended, position false means retracted
