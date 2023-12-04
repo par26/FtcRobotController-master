@@ -6,6 +6,7 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.control.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
@@ -37,9 +38,9 @@ public class Arm {
     DcMotorEx rightSlideMotor;
 
     //the number of ticks in a rotation of a motor
-    public final int SLIDE_MOTOR_TICKS_ROTATION = 123;
+    public final int SLIDE_MOTOR_TICKS_ROTATION = 384;
     //how many rotations does it take to extend the slides to it's max height
-    public final double SLIDE_ROTATIONS_MAX = 8.7;
+    public final double SLIDE_ROTATIONS_MAX = 8.7 * .52;
 
 
     public final double MAX_POSITION = SLIDE_ROTATIONS_MAX * SLIDE_MOTOR_TICKS_ROTATION;
@@ -67,10 +68,9 @@ public class Arm {
         rightClawServo.scaleRange(0.2, .45);
         leftClawServo.scaleRange(0.2, .45);
 
+        //leftClawServo.setDirection(Servo.Direction.REVERSE);
 
-
-        leftClawServo.setDirection(Servo.Direction.REVERSE);
-        rightElbowServo = hwMap.get(ServoImplEx.class, "rightElbowServo");
+       rightElbowServo = hwMap.get(ServoImplEx.class, "rightElbowServo");
         leftElbowServo = hwMap.get(ServoImplEx.class, "leftElbowServo");
 
         rightElbowServo.scaleRange(0, MAX_RETRACT_ANGLE);
@@ -83,6 +83,8 @@ public class Arm {
         rightSlideMotor = hwMap.get(DcMotorEx.class, "rightSlideMotor");
         rightSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftSlideMotor.setDirection(DcMotorEx.Direction.REVERSE);
+
 
         leftClawServo.setPosition(0);
         rightClawServo.setPosition(0);
@@ -102,8 +104,8 @@ public class Arm {
 
 
     public void closeClaw() {
-        leftClawServo.setPosition(leftClosePositionValue);
-        rightClawServo.setPosition(rightClosePositionValue);
+        leftClawServo.setPosition(0);
+        rightClawServo.setPosition(0);
         clawClosed = true;
     }
     public void openClaw() {//ignore this
@@ -165,12 +167,12 @@ public class Arm {
     public void retractArm() {
 
         //set linear slide motors to x position
-        powerSlides(1);
+        //powerSlides(1);
 
 
 
-        leftElbowServo.setDirection(Servo.Direction.FORWARD);
-        rightElbowServo.setDirection(Servo.Direction.FORWARD);
+        //leftElbowServo.setDirection(Servo.Direction.FORWARD);
+        //rightElbowServo.setDirection(Servo.Direction.FORWARD);
 
         leftElbowServo.setPosition(0);
         rightElbowServo.setPosition(0);
@@ -192,7 +194,7 @@ public class Arm {
         //move rotate claw servo to 180 degress
 
 
-        if(Math.abs(leftElbowServo.getPosition() - EXTEND_ARM_POS)  < 0.1) {
+        if(Math.abs(leftElbowServo.getPosition() - EXTEND_ARM_POS)  > .95) {
             retracted = false;
         }
 
@@ -224,10 +226,6 @@ public class Arm {
         rightSlideMotor.setPower(1);
     }
 
-    public void powerSlidesUp() {
-        leftSlideMotor.setPower(.7);
-        rightSlideMotor.setPower(.7);
-    }
 
     public void powerSlides(double power) {
         leftSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -235,10 +233,12 @@ public class Arm {
 
         //use the pid to determien what power to set the slides
         //multiply it by the power variable (-1, 1) as it will the be the velocity varialbe
-        while(leftSlideMotor.getCurrentPosition() >= 2 || leftSlideMotor.getCurrentPosition() <= MAX_POSITION) {
+        if(leftSlideMotor.getCurrentPosition() >= 2 || leftSlideMotor.getCurrentPosition() <= (int)MAX_POSITION) {
             leftSlideMotor.setPower(power);
             rightSlideMotor.setPower(power);
         }
+
+
 
     }
 
@@ -251,6 +251,11 @@ public class Arm {
     public void powerSlidesDown() {
         leftSlideMotor.setPower(-0.7);
         rightSlideMotor.setPower(-0.7);
+    }
+
+    public void powerSlidesStop() {
+        leftSlideMotor.setPower(0);
+        rightSlideMotor.setPower(0);
     }
 
 

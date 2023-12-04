@@ -11,7 +11,9 @@ import com.qualcomm.robotcore.hardware.ServoController;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.util.List;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+//import java.util.List;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TeleOp extends OpMode {
@@ -24,7 +26,7 @@ public class TeleOp extends OpMode {
 
 
 
-    List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+    //List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
 
 
@@ -69,9 +71,18 @@ public class TeleOp extends OpMode {
     boolean psb, csb = false;
 
 
+    Telemetry telemetry;
     final double armManualDeadband = 0.03;
     //rising edge for the
 
+
+
+
+    /*
+    Control Hub Wiring Specification
+    Port 0 - backRightMotor
+    Port 1 -
+     */
     @Override
     public void init() {
 
@@ -79,24 +90,50 @@ public class TeleOp extends OpMode {
         arm.init(hardwareMap);
         state = State.FULL_CONTROL_FWD;
 
-        for (LynxModule hub : allHubs) {
+        /*for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-        }
+        }*/
+
     }
 
     @Override
         public void loop() {
 
+        pa = ca;
+        ca = gamepad1.a;
+        if(ca && !pa) {
+            arm.closeClaw();
+        }
 
 
-            switch (state) {
+        pb = cb;
+        cb = gamepad1.b;
+
+        if(cb && !pb) {
+            arm.openClaw();
+        }
+
+
+
+        double forward = drive.squareInput(gamepad1.left_stick_y);
+        double rotate = drive.squareInput(gamepad1.left_stick_x);
+
+        double right = drive.squareInput(gamepad1.right_stick_x);
+
+        drive.drive(forward, right, rotate);
+
+
+        //telemetry.addData("leftSlide Position", arm.leftSlideMotor.getCurrentPosition());
+        double slidePower = (gamepad1.right_trigger -  gamepad1.left_trigger);
+
+
+        if (Math.abs(slidePower) > armManualDeadband) {
+            arm.powerSlides(slidePower);
+        }
+
+
+        switch (state) {
                 case FULL_CONTROL_FWD:
-
-                    pa = ca;
-                    ca = gamepad1.a;
-                    if(ca && !pa) {
-                        arm.closeClaw();
-                    }
 
                     px = cx;
                     cx = gamepad1.x;
@@ -110,42 +147,14 @@ public class TeleOp extends OpMode {
                     }
 
                 case FULL_CONTROL_BACK:
-
-                    pb = cb;
-                    cb = gamepad1.b;
-
-                    if(cb && !pb) {
-                        arm.openClaw();
-                    }
-
                     px = cx;
                     cx = gamepad1.x;
                     if(gamepad1.x) {
                         arm.retractArm();
                     }
-
                     if(!arm.retracted) {
                         state = State.FULL_CONTROL_FWD;
                     }
-
-
             }
-
-
-
-        double forward = drive.squareInput(-gamepad1.left_stick_y * 1.2);
-        double rotate = drive.squareInput(gamepad1.left_stick_x * .8);
-
-        double right = -drive.squareInput(gamepad1.right_stick_x);
-
-        drive.drive(forward, right, rotate);
-
-
-        double slidePower = gamepad1.right_trigger -  gamepad1.left_trigger;
-        //drive.driveFieldRelative(forward, right, rotate);
-        if (Math.abs(slidePower) > armManualDeadband) {
-            arm.powerSlides(slidePower);
-        }
-
         }
 }
