@@ -32,7 +32,7 @@ public class TestTeleop extends OpMode {
 
 
     boolean py = false;
-    boolean cy = false;
+     boolean cy = false;
 
     boolean pa = false;
     boolean ca = false;
