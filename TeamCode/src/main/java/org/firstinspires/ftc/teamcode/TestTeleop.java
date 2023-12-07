@@ -62,7 +62,7 @@ public class TestTeleop extends OpMode {
 
     @Override
     public void loop() {
-        double forward = drive.squareInput(gamepad1.left_stick_y * -1);
+        double forward = drive.squareInput(gamepad1.left_stick_y);
         double rotate = drive.squareInput(gamepad1.left_stick_x);
 
         double right = drive.squareInput(gamepad1.right_stick_x);

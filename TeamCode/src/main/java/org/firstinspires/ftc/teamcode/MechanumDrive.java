@@ -62,10 +62,10 @@ public class MechanumDrive {
 
         //double denominator = Math.max(Math.abs(right) + Math.abs(forward) + Math.abs(rotate), 1);
 
-        double fLeftPow = Range.clip(forward + rotate + right, -1, 1);
-        double bLeftPow = Range.clip(forward + rotate - right, -1, 1);
-        double fRightPow = Range.clip(forward - rotate - right, -1, 1);
-        double bRightPow = Range.clip(forward - rotate + right, -1, 1);
+        double fLeftPow = Range.clip(forward + rotate + right, -0.85, .85);
+        double bLeftPow = Range.clip(forward + rotate - right, -0.85, .85);
+        double fRightPow = Range.clip(forward - rotate - right, -0.85, .85);
+        double bRightPow = Range.clip(forward - rotate + right, -0.85, .85);
 
 
         setPowers(fLeftPow, fRightPow, bLeftPow, bRightPow);
