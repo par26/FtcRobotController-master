@@ -25,7 +25,7 @@ public class TestSlides extends TeleOp{
     @Override
     public void init() {
         leftSlides = hardwareMap.get(DcMotorEx.class, "leftSlide");
-        rightSlides = hardwareMap.get(DcMotorEx.class, "rightSlide");
+        //rightSlides = hardwareMap.get(DcMotorEx.class, "rightSlide");
 
         //telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
