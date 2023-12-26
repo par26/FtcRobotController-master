@@ -19,10 +19,10 @@ public class MechanumDrive {
     private IMU imu;
 
     public void init(HardwareMap hardwareMap) {
-        frontLeftMotor = hardwareMap.get(DcMotorEx.class, "front_left_motor");
-        frontRightMotor = hardwareMap.get(DcMotorEx.class, "front_right_motor");
-        backLeftMotor = hardwareMap.get(DcMotorEx.class, "back_left_motor");
-        backRightMotor = hardwareMap.get(DcMotorEx.class, "back_right_motor");
+        frontLeftMotor = hardwareMap.get(DcMotorEx.class, "leftFront");
+        frontRightMotor = hardwareMap.get(DcMotorEx.class, "rightFront");
+        backLeftMotor = hardwareMap.get(DcMotorEx.class, "leftRear");
+        backRightMotor = hardwareMap.get(DcMotorEx.class, "rightRear");
         imu = hardwareMap.get(IMU.class, "imu");
 
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP);
@@ -45,7 +45,7 @@ public class MechanumDrive {
         frontLeftMotor.setPower(frontLeftPower);
         frontRightMotor.setPower(frontRightPower);
         backLeftMotor.setPower(backLeftPower);
-        backRightMotor.setPower(backRightPower*.75);
+        backRightMotor.setPower(backRightPower*0.75);
     }
 
     public double squareInput(double input) {
@@ -62,10 +62,10 @@ public class MechanumDrive {
 
         //double denominator = Math.max(Math.abs(right) + Math.abs(forward) + Math.abs(rotate), 1);
 
-        double fLeftPow = Range.clip(forward + rotate + right, -1, 1);
-        double bLeftPow = Range.clip(forward + rotate - right, -1, 1);
-        double fRightPow = Range.clip(forward - rotate - right, -1, 1);
-        double bRightPow = Range.clip(forward - rotate + right, -1, 1);
+        double fLeftPow = Range.clip(forward + rotate + right, -0.85, 0.85);
+        double bLeftPow = Range.clip(forward + rotate - right, -0.85, 0.85);
+        double fRightPow = Range.clip(forward - rotate - right, -0.85, 0.85);
+        double bRightPow = Range.clip(forward - rotate + right, -0.85, 0.85);
 
 
         setPowers(fLeftPow, fRightPow, bLeftPow, bRightPow);
