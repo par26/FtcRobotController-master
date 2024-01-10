@@ -25,8 +25,9 @@ public class Arm {
     boolean clawClosed;
 
     boolean retracted = true;
-    ServoImplEx leftClawServo;
-    ServoImplEx rightClawServo;
+
+    Servo leftClaw;
+    Servo rightClaw;
 
     ServoImplEx leftElbowServo;
     ServoImplEx rightElbowServo;
@@ -47,34 +48,34 @@ public class Arm {
 
     public final double EXTEND_ARM_POS = .85;
 
-    //Claw Length in METERS
-    public final double CLAW_LENGTH =.238;
 
-    private final double MAX_RETRACT_ANGLE = 200.0/360.0;
+    public static double leftOpen = 0.0;
 
-    //The Minimum angle the Elbow can be
-    public final double ELBOW_MIN_ANGLE = -13.7;
+    public static double rightOpen = 0.0;
 
-    //The Mount height of pivoting system in METERS
-    public final double PIVOT_HEIGHT = .244;
-    public final int armRetractThreshold = 5;
+    public static double leftClose = .2;
+
+    public static double rightClose = .2;
+
 
     boolean slideMoving;
     public void init(HardwareMap hwMap) {
-        rightClawServo = hwMap.get(ServoImplEx.class, "rightClawServo");
-        leftClawServo = hwMap.get(ServoImplEx.class, "leftClawServo");
 
+        leftClaw = hwMap.get(Servo.class, "leftServo");
 
-        rightClawServo.scaleRange(0.2, .45);
-        leftClawServo.scaleRange(0.2, .45);
+        rightClaw = hwMap.get(Servo.class, "rightServo");
+
+        leftClaw.setDirection(Servo.Direction.REVERSE);
+
+        leftClaw.setPosition(0);
+        rightClaw.setPosition(0);
 
         //leftClawServo.setDirection(Servo.Direction.REVERSE);
 
        rightElbowServo = hwMap.get(ServoImplEx.class, "rightElbowServo");
         leftElbowServo = hwMap.get(ServoImplEx.class, "leftElbowServo");
 
-        rightElbowServo.scaleRange(0, MAX_RETRACT_ANGLE);
-        leftElbowServo.scaleRange(0, MAX_RETRACT_ANGLE);
+
 
         leftSlideMotor = hwMap.get(DcMotorEx.class, "leftSlideMotor");
         leftSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -83,35 +84,23 @@ public class Arm {
         rightSlideMotor = hwMap.get(DcMotorEx.class, "rightSlideMotor");
         rightSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftSlideMotor.setDirection(DcMotorEx.Direction.REVERSE);
 
 
-        leftClawServo.setPosition(0);
-        rightClawServo.setPosition(0);
 
         clawClosed = false;
     }
 
-    public boolean isButtonPressedChecker(boolean gamePad) {
-        boolean lastPressed = false, isPressed = false; //line 30 - 35 to ensure claw doesn't keep jittering when gamepad is pressed
-        boolean clawPosition = true;
-
-
-        lastPressed = isPressed;
-        isPressed = gamePad;
-        return lastPressed;
-    }
 
 
     public void closeClaw() {
-        leftClawServo.setPosition(0);
-        rightClawServo.setPosition(0);
+        leftClaw.setPosition(leftClose);
+        rightClaw.setPosition(rightClose);
         clawClosed = true;
     }
     public void openClaw() {//ignore this
 
-        leftClawServo.setPosition(1);
-        rightClawServo.setPosition(1);
+        leftClaw.setPosition(leftOpen);
+        rightClaw.setPosition(rightOpen);
         clawClosed = false;
     }
 
@@ -202,9 +191,6 @@ public class Arm {
 
 
 
-    public void servoMoveSlow(double targetPos, double delay) {
-
-    }
 
     //position true means extended, position false means retracted
     //assumes the motors are connected to two encoder slots, in the scenario, they aren't we may have to adjust

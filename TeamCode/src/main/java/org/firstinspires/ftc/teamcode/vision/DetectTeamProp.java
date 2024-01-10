@@ -35,7 +35,7 @@ public class DetectTeamProp implements VisionProcessor {
     //backlog of frames to average out to reduce noise
     ArrayList<double[]> frameList;
     //these are public static to be tuned in dashboard
-    public static double strictLowS = 140;
+    public static double strictLowS = 255;
     public static double strictHighS = 255;
 
     static final Rect LEFT_RECTANGLE = new Rect(
@@ -68,9 +68,9 @@ public class DetectTeamProp implements VisionProcessor {
             return frame;
         }
 
-        // lenient bounds will filter out near yellow, this should filter out all near yellow things(tune this if needed)
-        Scalar lowHSV = new Scalar(100, 58, 0); // lenient lower bound HSV for yellow
-        Scalar highHSV = new Scalar(130, 255, 255); // lenient higher bound HSV for yellow
+        Scalar lowHSV = new Scalar(210, 100, 50); // Adjust saturation and value as needed
+        Scalar highHSV = new Scalar(270, 255, 255); // Adjust saturation and value as needed
+
 
         Mat thresh = new Mat();
 
@@ -100,20 +100,7 @@ public class DetectTeamProp implements VisionProcessor {
         //color in scaledThresh with HSV, output into finalMask(only useful for showing result)(you can delete)
         Core.bitwise_and(mat, mat, finalMask, scaledThresh);
 
-        Mat edges = new Mat();
-        //detect edges(only useful for showing result)(you can delete)
-        Imgproc.Canny(scaledThresh, edges, 100, 200);
 
-        //contours, apply post processing to information
-        List<MatOfPoint> contours = new ArrayList<>();
-        Mat hierarchy = new Mat();
-        //find contours, frame scaledThresh because it has hard edges
-        Imgproc.findContours(scaledThresh, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        //list of frames to reduce inconsistency, not too many so that it is still real-time, change the number from 5 if you want
-        if (frameList.size() > 5) {
-            frameList.remove(0);
-        }
 
         double leftBox = Core.sumElems(finalMask.submat(LEFT_RECTANGLE)).val[0];
         double rightBox = Core.sumElems(finalMask.submat(RIGHT_RECTANGLE)).val[0];
@@ -121,14 +108,14 @@ public class DetectTeamProp implements VisionProcessor {
         double averagedLeftBox = leftBox / LEFT_RECTANGLE.area() / 255;
         double averagedRightBox = rightBox / RIGHT_RECTANGLE.area() / 255; //Makes value [0,1]
 
-
-        if(averagedLeftBox > blueThreshold) {
+        if(averagedLeftBox > blueThreshold){        //Must Tune Red Threshold
             outStr = "left";
-        } else if(averagedRightBox > blueThreshold) {
+        }else if(averagedRightBox> blueThreshold){
             outStr = "center";
-        } else {
+        }else{
             outStr = "right";
         }
+
 
 
         telemetry.addData("[Location]", outStr);
@@ -141,7 +128,7 @@ public class DetectTeamProp implements VisionProcessor {
         scaledMask.release();
         mat.release();
         masked.release();
-        edges.release();
+        //edges.release();
         thresh.release();
         finalMask.release();
         //change the return to whatever mat you want
@@ -173,7 +160,8 @@ public class DetectTeamProp implements VisionProcessor {
 
         canvas.drawRect(makeGraphicsRect(rect, scaleBmpPxToCanvasPx), rectPaint);
 
-        //canvas.drawRect(LEFT_RECTANGLE, rectPaint);
-        //canvas.drawRect(RIGHT_RECTANGLE, rectPaint);
+
+        canvas.drawRect(LEFT_RECTANGLE.x, LEFT_RECTANGLE.y, LEFT_RECTANGLE.width, LEFT_RECTANGLE.height, rectPaint);
+        canvas.drawRect(RIGHT_RECTANGLE.x, RIGHT_RECTANGLE.y, RIGHT_RECTANGLE.width, RIGHT_RECTANGLE.height, rectPaint);
     }
 }
