@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode;
 
 
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoController;
@@ -12,6 +14,7 @@ import com.qualcomm.robotcore.hardware.ServoControllerEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 
 //import java.util.List;
 
@@ -19,17 +22,19 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class TeleOp extends OpMode {
 
     //ProgrammingBoard board = new ProgrammingBoard();
-    MechanumDrive drive = new MechanumDrive();
+    SampleMecanumDrive drive;
     Arm arm = new Arm();
 
     ElapsedTime timer = new ElapsedTime();
-
-
 
     //List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
 
 
+
+    //Ports:
+    //leftPivot port 2
+    //right pivot port 5
     enum State {
         FULL_CONTROL_FWD,
 
@@ -86,7 +91,10 @@ public class TeleOp extends OpMode {
     @Override
     public void init() {
 
-        drive.init(hardwareMap);
+        drive = new SampleMecanumDrive(hardwareMap);
+
+        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         arm.init(hardwareMap);
         state = State.FULL_CONTROL_FWD;
 
@@ -114,14 +122,31 @@ public class TeleOp extends OpMode {
         }
 
 
+        drive.setWeightedDrivePower(
+                new Pose2d(
+                        -gamepad1.left_stick_y,
+                        -gamepad1.left_stick_x,
+                        -gamepad1.right_stick_x
+                )
+        );
 
-        double forward = drive.squareInput(gamepad1.left_stick_y);
-        double rotate = drive.squareInput(gamepad1.left_stick_x);
+        drive.update();
 
-        double right = drive.squareInput(gamepad1.right_stick_x);
 
-        drive.drive(forward, right, rotate);
 
+        //Open left
+        px = cx;
+        cx = gamepad1.x;
+        if (cx && !px) {
+            arm.openClaw();
+        }
+
+        //Close left
+        pa = ca;
+        ca = gamepad1.a;
+        if (ca && !pa) {
+            arm.closeClaw();
+        }
 
         //telemetry.addData("leftSlide Position", arm.leftSlideMotor.getCurrentPosition());
         double slidePower = (gamepad1.right_trigger -  gamepad1.left_trigger);

@@ -16,12 +16,9 @@ public class TestSlides extends TeleOp{
     DcMotorEx leftSlides;
     DcMotorEx rightSlides;
 
-    double motorDirection = 1.0;
 
-    FtcDashboard dashboard;
-
-
-    public static double Direction;
+    public static double LeftDirection;
+    public static double RightDirection;
     @Override
     public void init() {
         leftSlides = hardwareMap.get(DcMotorEx.class, "leftSlide");
@@ -31,25 +28,20 @@ public class TestSlides extends TeleOp{
 
         leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        Direction = 0;
+        LeftDirection = 0;
 
-        dashboard = FtcDashboard.getInstance();
-
-        motorDirection = 1.0;
+        RightDirection = 0;
     }
 
     @Override
     public void loop() {
 
-
-
         //double slidePower = gamepad1.right_trigger - gamepad1.left_trigger;
-        leftSlides.setPower(Direction);
+        leftSlides.setPower(LeftDirection);
+
+        rightSlides.setPower(RightDirection);
 
 
-        telemetry.addData("pos ", leftSlides.getCurrentPosition());
-        telemetry.addData("direction ", motorDirection);
-        telemetry.update();
 
     }
 }
