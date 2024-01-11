@@ -134,19 +134,7 @@ public class TeleOp extends OpMode {
 
 
 
-        //Open left
-        px = cx;
-        cx = gamepad1.x;
-        if (cx && !px) {
-            arm.openClaw();
-        }
 
-        //Close left
-        pa = ca;
-        ca = gamepad1.a;
-        if (ca && !pa) {
-            arm.closeClaw();
-        }
 
         //telemetry.addData("leftSlide Position", arm.leftSlideMotor.getCurrentPosition());
         double slidePower = (gamepad1.right_trigger -  gamepad1.left_trigger);
@@ -154,32 +142,29 @@ public class TeleOp extends OpMode {
 
         if (Math.abs(slidePower) > armManualDeadband) {
             arm.powerSlides(slidePower);
+        } else {
+            arm.powerSlides(0.0);
         }
 
+        px = cx;
+        cx = gamepad1.x;
 
-        switch (state) {
-                case FULL_CONTROL_FWD:
+        if(gamepad1.x && !px) {
+            arm.retractArm();
 
-                    px = cx;
-                    cx = gamepad1.x;
+        }
 
-                    if(cx && !px) {
-                        arm.extendArm();
-                    }
+        py = cy;
+        cy = gamepad1.y;
 
-                    if(arm.retracted) {
-                        state = State.FULL_CONTROL_BACK;
-                    }
+        if(gamepad1.y && !py) {
+            arm.extendArm();
 
-                case FULL_CONTROL_BACK:
-                    px = cx;
-                    cx = gamepad1.x;
-                    if(gamepad1.x) {
-                        arm.retractArm();
-                    }
-                    if(!arm.retracted) {
-                        state = State.FULL_CONTROL_FWD;
-                    }
-            }
+        }
+
+        telemetry.addLine("Position Left"  + arm.leftElbowServo.getPosition());
+        telemetry.addLine("Position Right"  + arm.rightElbowServo.getPosition());
+        telemetry.update();
+
         }
 }

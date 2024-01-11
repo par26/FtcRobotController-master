@@ -29,8 +29,8 @@ public class Arm {
     Servo leftClaw;
     Servo rightClaw;
 
-    ServoImplEx leftElbowServo;
-    ServoImplEx rightElbowServo;
+    Servo leftElbowServo;
+    Servo rightElbowServo;
 
 
 
@@ -61,9 +61,9 @@ public class Arm {
     boolean slideMoving;
     public void init(HardwareMap hwMap) {
 
-        leftClaw = hwMap.get(Servo.class, "leftServo");
+        leftClaw = hwMap.get(Servo.class, "leftClaw");
 
-        rightClaw = hwMap.get(Servo.class, "rightServo");
+        rightClaw = hwMap.get(Servo.class, "rightClaw");
 
         leftClaw.setDirection(Servo.Direction.REVERSE);
 
@@ -72,16 +72,20 @@ public class Arm {
 
         //leftClawServo.setDirection(Servo.Direction.REVERSE);
 
-       rightElbowServo = hwMap.get(ServoImplEx.class, "rightElbowServo");
-        leftElbowServo = hwMap.get(ServoImplEx.class, "leftElbowServo");
+       rightElbowServo = hwMap.get(ServoImplEx.class, "rightPivot");
+        leftElbowServo = hwMap.get(ServoImplEx.class, "leftPivot");
 
 
+        leftElbowServo.setDirection(Servo.Direction.REVERSE);
 
-        leftSlideMotor = hwMap.get(DcMotorEx.class, "leftSlideMotor");
+        leftElbowServo.setPosition(0);
+        rightElbowServo.setPosition(0);
+
+        leftSlideMotor = hwMap.get(DcMotorEx.class, "leftSlide");
         leftSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        rightSlideMotor = hwMap.get(DcMotorEx.class, "rightSlideMotor");
+        rightSlideMotor = hwMap.get(DcMotorEx.class, "rightSlide");
         rightSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -106,43 +110,6 @@ public class Arm {
 
 
 
-    /*
-    public void openClaw() {
-        double unroundedCurrentLCP = leftClawMotor.getPosition();
-        double currentLCP = Math.round(unroundedCurrentLCP * 10) / 10.0;
-
-        while (currentLCP != leftOpenPositionValue) {
-            double LCError = leftOpenPositionValue - currentLCP;
-            leftClawMotor.setPosition(LCError);
-        }
-
-        double unroundedCurrentRCP = rightClawMotor.getPosition();
-        double currentRCP = Math.round(unroundedCurrentRCP * 10) / 10.0;
-
-        while (currentLCP != rightOpenPositionValue) {
-            double RCError = rightOpenPositionValue - currentRCP;
-            leftClawMotor.setPosition(RCError);
-        }
-    }
-
-    public void closeClaw() {
-        double unroundedCurrentLCP = leftClawMotor.getPosition();
-        double currentLCP = Math.round(unroundedCurrentLCP * 10) / 10;
-
-        while (currentLCP != leftClosePositionValue) {
-            double LCError = leftClosePositionValue - currentLCP;
-            leftClawMotor.setPosition(LCError);
-        }
-
-        double unroundedCurrentRCP = rightClawMotor.getPosition();
-        double currentRCP = Math.round(unroundedCurrentRCP * 10) / 10;
-
-        while (currentLCP != rightClosePositionValue) {
-            double RCError = rightClosePositionValue - currentRCP;
-            leftClawMotor.setPosition(RCError);
-        }
-    } */
-
     //calcs the position the elbow and linear slides have to be in order to reach height
     //height is between the values 0-1 ig. 0 lowest height, 1 max height
     public void clawReachHeight(double height) {
@@ -155,13 +122,7 @@ public class Arm {
     //moves the claw arm upward
     public void retractArm() {
 
-        //set linear slide motors to x position
-        //powerSlides(1);
 
-
-
-        //leftElbowServo.setDirection(Servo.Direction.FORWARD);
-        //rightElbowServo.setDirection(Servo.Direction.FORWARD);
 
         leftElbowServo.setPosition(0);
         rightElbowServo.setPosition(0);
@@ -177,8 +138,8 @@ public class Arm {
 
 
         //
-        leftElbowServo.setPosition(1);
-        rightElbowServo.setPosition(1);
+        leftElbowServo.setPosition(.666);
+        rightElbowServo.setPosition(.666);
 
         //move rotate claw servo to 180 degress
 
@@ -229,20 +190,9 @@ public class Arm {
     }
 
     public void stopSlides() {
-        leftSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftSlideMotor.setPower(0);
-        rightSlideMotor.setPower(0);
+        //leftSlideMotor.s
     }
 
-    public void powerSlidesDown() {
-        leftSlideMotor.setPower(-0.7);
-        rightSlideMotor.setPower(-0.7);
-    }
-
-    public void powerSlidesStop() {
-        leftSlideMotor.setPower(0);
-        rightSlideMotor.setPower(0);
-    }
 
 
 
