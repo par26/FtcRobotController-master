@@ -3,25 +3,38 @@ package org.firstinspires.ftc.teamcode;
 
 
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.ServoController;
+import com.qualcomm.robotcore.hardware.ServoControllerEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.util.List;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
+
+//import java.util.List;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TeleOp extends OpMode {
 
     //ProgrammingBoard board = new ProgrammingBoard();
-    MechanumDrive drive = new MechanumDrive();
+    SampleMecanumDrive drive;
     Arm arm = new Arm();
 
+    ElapsedTime timer = new ElapsedTime();
+
+    //List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
 
-    List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
 
-
+    //Ports:
+    //leftPivot port 2
+    //right pivot port 5
     enum State {
         FULL_CONTROL_FWD,
 
@@ -63,103 +76,95 @@ public class TeleOp extends OpMode {
     boolean psb, csb = false;
 
 
+    Telemetry telemetry;
+    final double armManualDeadband = 0.03;
     //rising edge for the
 
+
+
+
+    /*
+    Control Hub Wiring Specification
+    Port 0 - backRightMotor
+    Port 1 -
+     */
     @Override
     public void init() {
 
-        drive.init(hardwareMap);
+        drive = new SampleMecanumDrive(hardwareMap);
+
+        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         arm.init(hardwareMap);
         state = State.FULL_CONTROL_FWD;
 
-        for (LynxModule hub : allHubs) {
+        /*for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-        }
+        }*/
+
     }
 
     @Override
         public void loop() {
 
+        pa = ca;
+        ca = gamepad1.a;
+        if(ca && !pa) {
+            arm.closeClaw();
+        }
 
 
-            switch (state) {
-                case FULL_CONTROL_FWD:
+        pb = cb;
+        cb = gamepad1.b;
 
-                    pb = cb;
-                    cb = gamepad1.b;
-                    if(cb && !pb) {
-                        arm.closeClaw();
-                    }
-                    plb = clb;
-                    clb = gamepad1.left_bumper;
+        if(cb && !pb) {
+            arm.openClaw();
+        }
 
-                    prb = crb;
-                    crb = gamepad1.right_bumper;
 
-                    if(clb && !prb) {
-                        arm.powerSlides(-.7);
-                        //adjust the elbow's angle based on the linear slide's position
-                    } else if(crb && !prb) {
-                        arm.powerSlides(.7);
-                    } else {
-                        arm.stopSlides();
-                    }
+        drive.setWeightedDrivePower(
+                new Pose2d(
+                        -gamepad1.left_stick_y,
+                        -gamepad1.left_stick_x,
+                        -gamepad1.right_stick_x
+                )
+        );
 
-                    px = cx;
-                    cx = gamepad1.x;
-
-                    if(cx && !px) {
-                        arm.retractArm();
-                    }
-
-                    if(arm.retracted) {
-                        state = State.FULL_CONTROL_BACK;
-                    }
-
-                case FULL_CONTROL_BACK:
-
-                    pb = cb;
-                    cb = gamepad1.b;
-
-                    if(cb && !pb) {
-                        arm.openClaw();
-                    }
-
-                    plb = clb;
-                    clb = gamepad1.left_bumper;
-
-                    prb = crb;
-                    crb = gamepad1.right_bumper;
-
-                    if(clb && !plb) {
-                        arm.powerSlides(-.7);
-                    } else if(crb && !prb) {
-                        arm.powerSlides(.7);
-                    } else {
-                        arm.stopSlides();
-                    }
+        drive.update();
 
 
 
-                    px = cx;
-                    cx = gamepad1.x;
-                    if(gamepad1.x) {
-                        arm.retractArm();
-                    }
-
-                    if(arm.retracted == false) {
-                        state = State.FULL_CONTROL_FWD;
-                    }
 
 
-            }
+        //telemetry.addData("leftSlide Position", arm.leftSlideMotor.getCurrentPosition());
+        double slidePower = (gamepad1.right_trigger -  gamepad1.left_trigger);
 
-        double forward = -gamepad1.left_stick_y;
-        double right = gamepad1.left_stick_x;
 
-        double rotate = gamepad1.right_stick_x;
+        if (Math.abs(slidePower) > armManualDeadband) {
+            arm.powerSlides(slidePower);
+        } else {
+            arm.powerSlides(0.0);
+        }
 
-        //drive.driveFieldRelative(forward, right, rotate);
+        px = cx;
+        cx = gamepad1.x;
+
+        if(gamepad1.x && !px) {
+            arm.retractArm();
+
+        }
+
+        py = cy;
+        cy = gamepad1.y;
+
+        if(gamepad1.y && !py) {
+            arm.extendArm();
+
+        }
+
+        telemetry.addLine("Position Left"  + arm.leftElbowServo.getPosition());
+        telemetry.addLine("Position Right"  + arm.rightElbowServo.getPosition());
+        telemetry.update();
 
         }
 }
