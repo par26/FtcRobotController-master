@@ -48,9 +48,9 @@ public class TestClaw extends OpMode {
 
    public static double rightOpen = 0.0;
 
-    public static double leftClose = .16;
+    public static double leftClose = .2;
 
-    public static double rightClose = .16;
+    public static double rightClose = .2;
 
     @Override
     public void init() {
