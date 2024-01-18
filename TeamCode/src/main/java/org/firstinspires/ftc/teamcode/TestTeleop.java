@@ -80,12 +80,11 @@ public class TestTeleop extends OpMode {
     Servo droneServo;
 
     public static double leftOpen = 0.0;
-
     public static double rightOpen = 0.0;
 
-    public static double leftClose = .2;
+    public static double leftClose = .25;
 
-    public static double rightClose = .2;
+    public static double rightClose = .25;
     @Override
     public void init() {
 
@@ -116,6 +115,8 @@ public class TestTeleop extends OpMode {
 
         leftClaw.setPosition(0);
         rightClaw.setPosition(0);
+
+        clawClosed = false;
 
         leftServo = hardwareMap.get(ServoImplEx.class, "leftServo");
         rightServo = hardwareMap.get(ServoImplEx.class, "rightServo");
@@ -154,39 +155,42 @@ public class TestTeleop extends OpMode {
             rightSlide.setPower(idle_power);
         }
         //Open left
-        py = cy;
-        cy = gamepad1.y;
-        if (cy && !py) {
-            leftClaw.setPosition(leftOpen);
-            rightClaw.setPosition(rightOpen);
-        }
-
-        //Close left
         pa = ca;
         ca = gamepad1.a;
         if (ca && !pa) {
-            leftClaw.setPosition(leftClose);
-            rightClaw.setPosition(rightClose);
-
+            if(clawClosed) {
+                leftClaw.setPosition(leftOpen);
+                rightClaw.setPosition(rightOpen);
+            } else {
+                leftClaw.setPosition(leftClose);
+                rightClaw.setPosition(rightClose);
+                //clawClosed = true;
+            }
         }
 
+       /* //Close left
+        pa = ca;
+        ca = gamepad1.a;
+        if (ca && !pa) {
+            leftClaw.setPosition(leftOpen);
+            rightClaw.setPosition(rightOpen);
 
-        px = cx;
-        cx = gamepad1.x;
-        if (clb && !plb) {
-            leftServo.setPosition(0);
-            rightServo.setPosition(0);
-        }
+        }*/
+
 
         pb = cb;
         cb = gamepad1.b;
         if (cb && !pb) {
+            leftServo.setPosition(0);
+            rightServo.setPosition(0);
+        }
+
+        py = cy;
+        cy = gamepad1.y;
+        if (cy && !py) {
             leftServo.setPosition(1.0);
             rightServo.setPosition(1.0);
         }
-
-
-
 
         if(gamepad1.dpad_up) {
             droneServo.setPosition(.5);
@@ -195,6 +199,13 @@ public class TestTeleop extends OpMode {
 
         drive.update();
         //powerSlides(slidePower);
+
+
+        if(Math.abs(leftClaw.getPosition() - leftClose) < .01) {
+            clawClosed = true;
+        } else {
+            clawClosed = false;
+        }
     }
 
 
