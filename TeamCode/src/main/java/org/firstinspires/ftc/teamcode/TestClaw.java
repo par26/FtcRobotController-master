@@ -63,6 +63,7 @@ public class TestClaw extends OpMode {
         leftClaw.setPosition(0);
         rightClaw.setPosition(0);
 
+        
     }
 
 
