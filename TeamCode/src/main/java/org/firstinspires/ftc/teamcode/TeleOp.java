@@ -1,4 +1,4 @@
-//package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode;//package org.firstinspires.ftc.teamcode;
 //
 //
 //
@@ -171,3 +171,71 @@ public class TeleOp extends OpMode {
 
         }
 } */
+
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.Servo;
+
+class Claw {
+    Servo leftClaw;
+    Servo rightClaw;
+
+
+    public void openClaw() {
+        leftClaw.setPosition(0);
+        rightClaw.setPosition(0);
+    }
+
+
+
+    public void closeClaw() {
+        leftClaw.setPosition(1);
+        rightClaw.setPosition(1);
+    }
+}
+
+
+
+
+
+
+
+
+public class TeleOp extends OpMode {
+
+
+
+
+
+
+    @Override
+    public void init() {
+
+    }
+
+    Claw claw = new Claw();
+
+
+
+
+    DcMotor leftSlide;
+    DcMotor rightSlide;
+
+
+    int targetPosition = 0;
+    @Override
+    public void loop()
+    {
+
+
+       if(leftSlide.getCurrentPosition() != targetPosition) {
+           leftSlide.setTargetPosition(targetPosition);
+       }
+    }
+
+
+
+
+}

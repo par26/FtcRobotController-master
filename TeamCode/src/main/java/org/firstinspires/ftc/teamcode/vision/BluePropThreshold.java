@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.vision;
 
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -21,6 +23,7 @@ public class BluePropThreshold implements VisionProcessor {
     Mat finalMat = new Mat();
     double redThreshold = 0.5;
 
+    Telemetry telemetry;
     String outStr = "left"; //Set a default value in case vision does not work
 
     static final Rect LEFT_RECTANGLE = new Rect(
@@ -38,9 +41,32 @@ public class BluePropThreshold implements VisionProcessor {
 
     }
 
+
+    public BluePropThreshold(Telemetry telemetry) {
+        this.telemetry = telemetry;
+    }
+
     @Override
     public Object processFrame(Mat frame, long captureTimeNanos) {
+
+
+
+        telemetry.addData("[Channels]", frame.channels());
+
+
+        //neccessary removes the 4th alpha channel
+        Imgproc.cvtColor(frame, frame, Imgproc.COLOR_RGBA2RGB);
+
+        telemetry.addData("[After Channels]", frame.channels());
+
         Imgproc.cvtColor(frame, testMat, Imgproc.COLOR_RGB2HSV);
+        if(testMat.empty()) {
+            return frame;
+        }
+
+
+
+
 
 
         Scalar lowHSVRedLower = new Scalar(0, 100, 20);  //Beginning of Color Wheel
@@ -52,7 +78,6 @@ public class BluePropThreshold implements VisionProcessor {
         Core.inRange(testMat, lowHSVRedLower, lowHSVRedUpper, lowMat);
         Core.inRange(testMat, redHSVRedLower, highHSVRedUpper, highMat);
 
-        testMat.release();
 
         Core.bitwise_or(lowMat, highMat, finalMat);
 
@@ -73,9 +98,18 @@ public class BluePropThreshold implements VisionProcessor {
             outStr = "right";
         }
 
+
+        telemetry.addData("[Location]", outStr);
+        telemetry.update();
+
+
+        //return testMat;
+        //testMat.release();
+
+
         finalMat.copyTo(frame); /*This line should only be added in when you want to see your custom pipeline
-                                  on the driver station stream, do not use this permanently in your code as
-                                  you use the "frame" mat for all of your pipelines, such as April Tags*/
+                                  //on the driver station stream, do not use this permanently in your code as
+                                  //you use the "frame" mat for all of your pipelines, such as April Tags*/
         return finalMat;            //You do not return the original mat anymore, instead return null
 
     }

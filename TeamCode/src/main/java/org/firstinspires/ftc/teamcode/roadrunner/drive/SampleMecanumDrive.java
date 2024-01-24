@@ -113,6 +113,8 @@ public class SampleMecanumDrive extends MecanumDrive {
             motor.setMotorType(motorConfigurationType);
         }
 
+
+
         if (RUN_USING_ENCODER) {
             setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
@@ -127,13 +129,13 @@ public class SampleMecanumDrive extends MecanumDrive {
         //leftFront.setDirection(DcMotor.Direction.REVERSE);
         //rightFront.setDirection(DcMotor.Direction.REVERSE);
         //rightRear.setDirection(DcMotor.Direction.REVERSE);
-        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftRear.setDirection(DcMotorEx.Direction.REVERSE);
 
         List<Integer> lastTrackingEncPositions = new ArrayList<>();
         List<Integer> lastTrackingEncVels = new ArrayList<>();
 
         // TODO: if desired, use setLocalizer() to change the localization method
-        // setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
+        //setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(
                 follower, HEADING_PID, batteryVoltageSensor,
@@ -258,17 +260,33 @@ public class SampleMecanumDrive extends MecanumDrive {
         setDrivePower(vel);
     }
 
+    //Arrays.asList(leftFront, leftRear, rightRear, rightFront);
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
         lastEncPositions.clear();
 
         List<Double> wheelPositions = new ArrayList<>();
-        for (DcMotorEx motor : motors) {
-            int position = motor.getCurrentPosition();
-            lastEncPositions.add(position);
-            wheelPositions.add(encoderTicksToInches(position));
-        }
+
+        int leftF = ( motors.get(0).getCurrentPosition());
+        lastEncVels.add(leftF);
+        wheelPositions.add(encoderTicksToInches(leftF));
+
+
+        int leftR = (int) motors.get(1).getVelocity() * -1;
+        lastEncVels.add(leftR);
+        wheelPositions.add(encoderTicksToInches(leftR));
+
+
+        int rightF = (int)  motors.get(2).getVelocity();
+        lastEncVels.add(rightF);
+        wheelPositions.add(encoderTicksToInches(rightF));
+
+        int rightR = ((int)  motors.get(3).getVelocity());
+        lastEncVels.add(rightR);
+        wheelPositions.add(encoderTicksToInches(rightR));
+
+
         return wheelPositions;
     }
 
@@ -277,12 +295,27 @@ public class SampleMecanumDrive extends MecanumDrive {
         lastEncVels.clear();
 
         List<Double> wheelVelocities = new ArrayList<>();
-        for (DcMotorEx motor : motors) {
-            int vel = (int) motor.getVelocity();
-            lastEncVels.add(vel);
-            wheelVelocities.add(encoderTicksToInches(vel));
-        }
+
+        int leftF = ((int)  motors.get(0).getVelocity());
+        lastEncVels.add(leftF);
+        wheelVelocities.add(encoderTicksToInches(leftF));
+
+
+        int leftR = (int) motors.get(1).getVelocity() * -1;
+        lastEncVels.add(leftR);
+        wheelVelocities.add(encoderTicksToInches(leftR));
+
+
+        int rightF = (int)  motors.get(2).getVelocity();
+        lastEncVels.add(rightF);
+        wheelVelocities.add(encoderTicksToInches(rightF));
+
+        int rightR = ((int)  motors.get(3).getVelocity());
+        lastEncVels.add(rightR);
+        wheelVelocities.add(encoderTicksToInches(rightR));
+
         return wheelVelocities;
+
     }
 
     @Override

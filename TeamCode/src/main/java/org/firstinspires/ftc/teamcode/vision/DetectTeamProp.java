@@ -153,15 +153,17 @@ public class DetectTeamProp implements VisionProcessor {
     public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
         Rect rect = new Rect(20, 20, 50, 50);
 
+        Rect leftRect = new Rect(LEFT_RECTANGLE.x, LEFT_RECTANGLE.y, LEFT_RECTANGLE.width, LEFT_RECTANGLE.height);
+        Rect rightRect = new Rect(RIGHT_RECTANGLE.x, RIGHT_RECTANGLE.y, RIGHT_RECTANGLE.width, RIGHT_RECTANGLE.height);
+
         Paint rectPaint = new Paint();
         rectPaint.setColor(Color.RED);
         rectPaint.setStyle(Paint.Style.STROKE);
         rectPaint.setStrokeWidth(scaleCanvasDensity * 4);
 
-        canvas.drawRect(makeGraphicsRect(rect, scaleBmpPxToCanvasPx), rectPaint);
+        canvas.drawRect(makeGraphicsRect(leftRect, scaleBmpPxToCanvasPx), rectPaint);
+        canvas.drawRect(makeGraphicsRect(rightRect, scaleBmpPxToCanvasPx), rectPaint);
 
 
-        canvas.drawRect(LEFT_RECTANGLE.x, LEFT_RECTANGLE.y, LEFT_RECTANGLE.width, LEFT_RECTANGLE.height, rectPaint);
-        canvas.drawRect(RIGHT_RECTANGLE.x, RIGHT_RECTANGLE.y, RIGHT_RECTANGLE.width, RIGHT_RECTANGLE.height, rectPaint);
     }
 }

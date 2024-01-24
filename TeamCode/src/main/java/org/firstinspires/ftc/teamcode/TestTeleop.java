@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.drive.Drive;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,6 +14,8 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
+
+import java.util.List;
 
 @Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
@@ -85,10 +88,15 @@ public class TestTeleop extends OpMode {
     public static double leftClose = .25;
 
     public static double rightClose = .25;
+
+    List<LynxModule> allHubs;
     @Override
     public void init() {
 
         drive = new SampleMecanumDrive(hardwareMap);
+
+
+       allHubs = hardwareMap.getAll(LynxModule.class);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -131,10 +139,21 @@ public class TestTeleop extends OpMode {
 
         droneServo.setDirection(Servo.Direction.REVERSE);
 
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
     }
 
     @Override
     public void loop() {
+
+
+        if(Math.abs(leftClaw.getPosition() - leftClose) < .01) {
+            clawClosed = true;
+        } else {
+            clawClosed = false;
+        }
+
         drive.setWeightedDrivePower(
                 new Pose2d(
                         -gamepad1.left_stick_y,
@@ -146,14 +165,6 @@ public class TestTeleop extends OpMode {
 
         double slidePower = Range.clip(gamepad1.right_trigger - gamepad1.left_trigger, -0.75, 0.75);
 
-
-        if(Math.abs(slidePower) < arm_deadband) {
-            leftSlide.setPower(slidePower);
-            rightSlide.setPower(slidePower);
-        } else {
-            leftSlide.setPower(idle_power);
-            rightSlide.setPower(idle_power);
-        }
         //Open left
         pa = ca;
         ca = gamepad1.a;
@@ -201,11 +212,40 @@ public class TestTeleop extends OpMode {
         //powerSlides(slidePower);
 
 
-        if(Math.abs(leftClaw.getPosition() - leftClose) < .01) {
-            clawClosed = true;
-        } else {
-            clawClosed = false;
+
+
+        if(gamepad1.b) {
+            //max height
+            moveSlidesToPostion(1500);
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        if(Math.abs(slidePower) < arm_deadband) {
+            leftSlide.setPower(slidePower);
+            rightSlide.setPower(slidePower);
+        } else {
+            leftSlide.setPower(idle_power);
+            rightSlide.setPower(idle_power);
+        }
+
+
+
     }
 
 
@@ -213,5 +253,20 @@ public class TestTeleop extends OpMode {
     public void stop() {
         droneServo.setPosition(0.0);
     }
+
+
+
+
+
+
+
+    public void moveSlidesToPostion(int targetPosition) {
+        while(leftSlide.getCurrentPosition() != targetPosition) {
+            leftSlide.setTargetPosition(targetPosition);
+        }
+    }
+
+
+
 
 }
