@@ -1,13 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.drive.Drive;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
@@ -19,7 +17,7 @@ import java.util.List;
 
 @Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
-public class TestTeleop extends OpMode {
+public class DuoTeleop extends OpMode {
 
 
     SampleMecanumDrive drive;
@@ -85,9 +83,9 @@ public class TestTeleop extends OpMode {
     public static double leftOpen = 0.0;
     public static double rightOpen = 0.0;
 
-    public static double leftClose = .2;
+    public static double leftClose = .20;
 
-    public static double rightClose = .2;
+    public static double rightClose = .20;
 
     List<LynxModule> allHubs;
     @Override
@@ -143,9 +141,6 @@ public class TestTeleop extends OpMode {
         //+rightServo.setDirection(Servo.Direction.REVERSE);
         leftServo.setDirection(Servo.Direction.REVERSE);
 
-        leftServo.setPosition(0.006);
-        rightServo.setPosition(0.006);
-
         droneServo = hardwareMap.get(Servo.class, "droneServo");
 
         droneServo.setDirection(Servo.Direction.REVERSE);
@@ -173,9 +168,10 @@ public class TestTeleop extends OpMode {
                 )
         );
 
+
         //Open left
         pa = ca;
-        ca = gamepad1.a;
+        ca = gamepad2.a;
         if (ca && !pa) {
             if(clawClosed) {
                 leftClaw.setPosition(leftOpen);
@@ -187,23 +183,18 @@ public class TestTeleop extends OpMode {
             }
         }
 
-       /* //Close left
-        pa = ca;
-        ca = gamepad1.a;
-        if (ca && !pa) {
-            leftClaw.setPosition(leftOpen);
-            rightClaw.setPosition(rightOpen);
 
-        }*/
         pb = cb;
-        cb = gamepad1.b;
+        cb = gamepad2.b;
         if (cb && !pb) {
-                leftServo.setPosition(0.006);
-                rightServo.setPosition(0.006);
+            if(clawClosed) {
+                leftServo.setPosition(0.0);
+                rightServo.setPosition(0.0);
+            }
         }
 
         py = cy;
-        cy = gamepad1.y;
+        cy = gamepad2.y;
         if (cy && !py) {
             leftServo.setPosition(1.0);
             rightServo.setPosition(1.0);
@@ -213,7 +204,7 @@ public class TestTeleop extends OpMode {
             droneServo.setPosition(.5);
         }
 
-        double slidePower = Range.clip(gamepad1.right_trigger - gamepad1.left_trigger, -0.75, 0.75);
+        double slidePower = Range.clip(gamepad2.right_trigger - gamepad2.left_trigger, -0.75, 0.75);
         if(Math.abs(slidePower) < arm_deadband) {
             leftSlide.setPower(0);
             rightSlide.setPower(0);
@@ -222,14 +213,9 @@ public class TestTeleop extends OpMode {
             rightSlide.setPower(slidePower);
         }
 
-
-
         drive.update();
         //powerSlides(slidePower);
 
-
-        telemetry.addData("Claw close value", clawClosed);
-        telemetry.update();
 
     }
 

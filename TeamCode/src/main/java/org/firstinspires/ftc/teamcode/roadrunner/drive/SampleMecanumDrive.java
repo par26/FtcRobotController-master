@@ -346,4 +346,17 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static TrajectoryAccelerationConstraint getAccelerationConstraint(double maxAccel) {
         return new ProfileAccelerationConstraint(maxAccel);
     }
+
+    public static double normalizeAngle(double angle) {
+        if(angle > 180) {
+            angle -= 2 * 180;
+        } else if(angle < 180) {
+            angle += 2 * 180;
+        }
+
+        return angle;
+    }
+
+
+
 }

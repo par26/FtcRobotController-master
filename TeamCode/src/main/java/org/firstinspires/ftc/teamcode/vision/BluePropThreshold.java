@@ -26,12 +26,12 @@ public class BluePropThreshold implements VisionProcessor {
     Telemetry telemetry;
     String outStr = "left"; //Set a default value in case vision does not work
 
-    static final Rect LEFT_RECTANGLE = new Rect(
+    public static Rect LEFT_RECTANGLE = new Rect(
             new Point(0, 0),
             new Point(0, 0)
     );
 
-    static final Rect RIGHT_RECTANGLE = new Rect(
+    public static Rect RIGHT_RECTANGLE = new Rect(
             new Point(0, 0),
             new Point(0, 0)
     );
@@ -115,8 +115,30 @@ public class BluePropThreshold implements VisionProcessor {
     }
 
 
+    private android.graphics.Rect makeGraphicsRect(Rect rect, float scaleBmpPxToCanvasPx) {
+        int left = Math.round(rect.x * scaleBmpPxToCanvasPx);
+        int top = Math.round(rect.y * scaleBmpPxToCanvasPx);
+        int right = left + Math.round(rect.width * scaleBmpPxToCanvasPx);
+        int bottom = top + Math.round(rect.height * scaleBmpPxToCanvasPx);
+
+        return new android.graphics.Rect(left, top, right, bottom);
+    }
+
     @Override
     public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
+        Rect rect = new Rect(20, 20, 50, 50);
+
+        Rect leftRect = new Rect(LEFT_RECTANGLE.x, LEFT_RECTANGLE.y, LEFT_RECTANGLE.width, LEFT_RECTANGLE.height);
+        Rect rightRect = new Rect(RIGHT_RECTANGLE.x, RIGHT_RECTANGLE.y, RIGHT_RECTANGLE.width, RIGHT_RECTANGLE.height);
+
+        Paint rectPaint = new Paint();
+        rectPaint.setColor(Color.RED);
+        rectPaint.setStyle(Paint.Style.STROKE);
+        rectPaint.setStrokeWidth(scaleCanvasDensity * 4);
+
+        canvas.drawRect(makeGraphicsRect(leftRect, scaleBmpPxToCanvasPx), rectPaint);
+        canvas.drawRect(makeGraphicsRect(rightRect, scaleBmpPxToCanvasPx), rectPaint);
+
 
     }
 

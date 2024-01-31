@@ -21,7 +21,8 @@
 //    double leftClosePositionValue; //declaring servo's close position value so easily manipulable
 //    double rightOpenPositionValue; //declaring servo's open position value so easily manipulable
 //    double rightClosePositionValue; //declaring servo's close position value so easily manipulable
-//
+
+// RK was here
 //
 //    boolean clawClosed;
 //
